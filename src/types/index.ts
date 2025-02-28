@@ -28,6 +28,19 @@ export interface Faculty {
   email: string;
   joiningDate: string;
   imageUrl?: string;
+  availability?: TeacherAvailability[];
+}
+
+export interface TeacherAvailability {
+  day: WeekDay;
+  slots: TimeSlot[];
+}
+
+export interface TimeSlot {
+  periodNumber: number;
+  startTime: string;
+  endTime: string;
+  isAvailable: boolean;
 }
 
 export interface Class {
@@ -42,8 +55,10 @@ export interface Class {
   room: string;
 }
 
+export type WeekDay = 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday';
+
 export interface ClassSchedule {
-  day: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday';
+  day: WeekDay;
   periods: Period[];
 }
 
@@ -83,4 +98,51 @@ export interface RecentActivity {
   description: string;
   date: string;
   time: string;
+}
+
+export interface TimetableSettings {
+  periodsPerDay: number;
+  daysInWeek: WeekDay[];
+  startTime: string;
+  endTime: string;
+  periodDuration: number;
+  breakDuration: number;
+  lunchBreakAfter: number;
+  lunchBreakDuration: number;
+}
+
+export interface TimetableGenerationConstraints {
+  maxPeriodsPerTeacherPerDay: number;
+  minGapBetweenSameSubject: number;
+  preferredSubjectsInMorning: string[];
+  avoidConsecutivePeriodsForSubjects: string[];
+}
+
+export interface ClassSubjectAllocation {
+  classId: string;
+  className: string;
+  subjectAllocations: SubjectAllocation[];
+}
+
+export interface SubjectAllocation {
+  subject: string;
+  periodsPerWeek: number;
+  assignedTeacher: string;
+  preferredDays?: WeekDay[];
+}
+
+export interface GeneratedTimetable {
+  classId: string;
+  className: string;
+  schedule: ClassSchedule[];
+  conflicts?: TimetableConflict[];
+}
+
+export interface TimetableConflict {
+  type: 'teacher_unavailable' | 'teacher_overlap' | 'subject_constraint';
+  day: WeekDay;
+  periodNumber: number;
+  subject: string;
+  teacher: string;
+  message: string;
 }

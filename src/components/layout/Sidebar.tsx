@@ -26,7 +26,8 @@ import {
 } from '@/components/ui/sidebar';
 
 const Sidebar = () => {
-  const { expanded } = useSidebar();
+  const { state } = useSidebar();
+  const expanded = state === "expanded";
 
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/' },

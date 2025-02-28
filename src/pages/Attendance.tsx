@@ -36,10 +36,10 @@ import {
 import SearchField from '@/components/ui/SearchField';
 import DashboardCard from '@/components/dashboard/DashboardCard';
 import DataTable from '@/components/ui/DataTable';
-import { Attendance } from '@/types';
+import { type Attendance as AttendanceType } from '@/types';
 
 // Mock data for demonstration
-const mockAttendance: Attendance[] = Array.from({ length: 40 }, (_, i) => ({
+const mockAttendance: AttendanceType[] = Array.from({ length: 40 }, (_, i) => ({
   id: `A${1000 + i}`,
   date: `2023-07-${(i % 30) + 1}`,
   class: `${9 + Math.floor((i % 9) / 3)}`,
@@ -61,7 +61,7 @@ const formatDate = (dateString: string) => {
 };
 
 // Helper function to get status badge
-const getStatusBadge = (status: Attendance['status']) => {
+const getStatusBadge = (status: AttendanceType['status']) => {
   switch (status) {
     case 'Present':
       return (
@@ -96,16 +96,16 @@ const getStatusBadge = (status: Attendance['status']) => {
 
 const attendanceColumns = [
   {
-    accessor: 'date',
+    accessor: 'date' as keyof AttendanceType,
     header: 'Date',
     sortable: true,
-    cell: (record: Attendance) => formatDate(record.date),
+    cell: (record: AttendanceType) => formatDate(record.date),
   },
   {
-    accessor: 'studentName',
+    accessor: 'studentName' as keyof AttendanceType,
     header: 'Student',
     sortable: true,
-    cell: (record: Attendance) => (
+    cell: (record: AttendanceType) => (
       <div className="flex items-center gap-2">
         <Avatar className="h-8 w-8">
           <AvatarImage src="" alt={record.studentName} />
@@ -119,30 +119,30 @@ const attendanceColumns = [
     ),
   },
   {
-    accessor: (record: Attendance) => `${record.class} ${record.section}`,
+    accessor: (record: AttendanceType) => `${record.class} ${record.section}`,
     header: 'Class',
     sortable: true,
-    cell: (record: Attendance) => (
+    cell: (record: AttendanceType) => (
       <div>
         <p>Class {record.class} {record.section}</p>
       </div>
     ),
   },
   {
-    accessor: 'status',
+    accessor: 'status' as keyof AttendanceType,
     header: 'Status',
     sortable: true,
-    cell: (record: Attendance) => getStatusBadge(record.status),
+    cell: (record: AttendanceType) => getStatusBadge(record.status),
   },
   {
-    accessor: 'reason',
+    accessor: 'reason' as keyof AttendanceType,
     header: 'Reason',
-    cell: (record: Attendance) => (
+    cell: (record: AttendanceType) => (
       <div>{record.reason || '-'}</div>
     ),
   },
   {
-    accessor: 'id',
+    accessor: 'id' as keyof AttendanceType,
     header: '',
     cell: () => (
       <DropdownMenu>

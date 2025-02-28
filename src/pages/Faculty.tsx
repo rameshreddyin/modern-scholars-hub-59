@@ -7,7 +7,12 @@ import {
   MoreHorizontal,
   UserPlus,
   FileSpreadsheet,
-  Printer
+  Printer,
+  Mail,
+  Phone,
+  Calendar,
+  Bookmark,
+  Award
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -22,26 +27,22 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import SearchField from '@/components/ui/SearchField';
 import DataTable from '@/components/ui/DataTable';
-import { Faculty } from '@/types';
+import { type Faculty as FacultyType } from '@/types';
 
 // Mock data for demonstration
-const mockFaculty: Faculty[] = Array.from({ length: 12 }, (_, i) => ({
-  id: `F${100 + i}`,
-  name: ['Dr. Rajesh Kumar', 'Mrs. Priya Sharma', 'Mr. Amit Singh', 'Dr. Neha Gupta', 'Mr. Vikram Mehta', 'Mrs. Anjali Verma', 'Mr. Sanjay Patel', 'Dr. Pooja Reddy'][i % 8],
-  employeeId: `EMP${1000 + i}`,
-  department: ['Mathematics', 'Science', 'English', 'Hindi', 'Social Studies', 'Computer Science', 'Physical Education'][i % 7],
-  position: ['Principal', 'Vice Principal', 'Head of Department', 'Senior Teacher', 'Teacher', 'Lab Assistant'][i % 5],
-  gender: i % 2 === 0 ? 'Male' : 'Female',
+const mockFaculty: FacultyType[] = Array.from({ length: 15 }, (_, i) => ({
+  id: `F${1000 + i}`,
+  name: ['Dr. Rajesh Kumar', 'Mrs. Priya Sharma', 'Prof. Amit Singh', 'Dr. Neha Gupta', 'Mr. Vikram Mehta', 'Mrs. Anjali Verma', 'Dr. Sanjay Patel', 'Ms. Pooja Reddy', 'Prof. Raj Malhotra', 'Dr. Ananya Das'][i % 10],
+  employeeId: `EMP${2023100 + i}`,
+  department: ['Mathematics', 'Science', 'English', 'Hindi', 'Social Science', 'Computer Science', 'Physical Education'][i % 7],
+  position: ['Senior Teacher', 'Teacher', 'HOD', 'Vice Principal', 'Principal', 'Lab Assistant'][i % 6],
+  gender: i % 3 === 0 ? 'Female' : (i % 3 === 1 ? 'Male' : 'Other'),
   subject: [
-    ['Mathematics', 'Physics'],
-    ['Biology', 'Chemistry'],
-    ['English Literature', 'Grammar'],
-    ['Hindi', 'Sanskrit'],
-    ['History', 'Civics', 'Geography'],
-    ['Computer Science', 'Information Technology'],
-    ['Physical Education']
-  ][i % 7],
-  qualification: ['Ph.D.', 'M.Sc.', 'M.A.', 'B.Ed.', 'M.Tech.'][i % 5],
+    ['Algebra', 'Geometry', 'Calculus'][i % 3],
+    ['Physics', 'Chemistry', 'Biology'][i % 3],
+    ['English Literature', 'Grammar'][i % 2],
+  ],
+  qualification: ['Ph.D.', 'M.Ed', 'M.Sc', 'B.Ed', 'M.A.'][i % 5],
   contactNumber: `+91 98765${10000 + i}`,
   email: `faculty${i}@schoolsync.edu`,
   joiningDate: `${2010 + (i % 10)}-${(i % 12) + 1}-${(i % 28) + 1}`,
@@ -49,57 +50,84 @@ const mockFaculty: Faculty[] = Array.from({ length: 12 }, (_, i) => ({
 
 const facultyColumns = [
   {
-    accessor: 'employeeId',
-    header: 'ID',
+    accessor: 'employeeId' as keyof FacultyType,
+    header: 'Employee ID',
     sortable: true,
   },
   {
-    accessor: 'name',
+    accessor: 'name' as keyof FacultyType,
     header: 'Name',
     sortable: true,
-    cell: (faculty: Faculty) => (
+    cell: (faculty: FacultyType) => (
       <div className="flex items-center gap-2">
         <Avatar className="h-8 w-8">
           <AvatarImage src="" alt={faculty.name} />
           <AvatarFallback>{faculty.name.substring(0, 2).toUpperCase()}</AvatarFallback>
         </Avatar>
-        <span>{faculty.name}</span>
+        <div>
+          <p className="font-medium">{faculty.name}</p>
+          <p className="text-xs text-muted-foreground">{faculty.position}</p>
+        </div>
       </div>
     ),
   },
   {
-    accessor: 'department',
+    accessor: 'department' as keyof FacultyType,
     header: 'Department',
     sortable: true,
   },
   {
-    accessor: 'position',
-    header: 'Position',
-    sortable: true,
-  },
-  {
-    accessor: 'subject',
+    accessor: 'subject' as keyof FacultyType,
     header: 'Subjects',
-    cell: (faculty: Faculty) => (
+    cell: (faculty: FacultyType) => (
       <div className="flex flex-wrap gap-1">
-        {faculty.subject.map((subject, index) => (
-          <Badge key={index} variant="outline" className="text-xs">
-            {subject}
+        {faculty.subject.map((subj, idx) => (
+          <Badge key={idx} variant="outline" className="bg-primary/10">
+            {subj}
           </Badge>
         ))}
       </div>
     ),
   },
   {
-    accessor: 'qualification',
-    header: 'Qualification',
-  },
-  {
-    accessor: 'contactNumber',
+    accessor: 'contactNumber' as keyof FacultyType,
     header: 'Contact',
+    cell: (faculty: FacultyType) => (
+      <div className="flex flex-col gap-1">
+        <div className="flex items-center text-xs">
+          <Phone className="h-3 w-3 mr-1 text-muted-foreground" />
+          {faculty.contactNumber}
+        </div>
+        <div className="flex items-center text-xs">
+          <Mail className="h-3 w-3 mr-1 text-muted-foreground" />
+          {faculty.email}
+        </div>
+      </div>
+    ),
   },
   {
-    accessor: 'id',
+    accessor: 'qualification' as keyof FacultyType,
+    header: 'Qualification',
+    cell: (faculty: FacultyType) => (
+      <div className="flex items-center">
+        <Award className="h-3 w-3 mr-1 text-muted-foreground" />
+        {faculty.qualification}
+      </div>
+    ),
+  },
+  {
+    accessor: 'joiningDate' as keyof FacultyType,
+    header: 'Joined On',
+    sortable: true,
+    cell: (faculty: FacultyType) => (
+      <div className="flex items-center">
+        <Calendar className="h-3 w-3 mr-1 text-muted-foreground" />
+        {new Date(faculty.joiningDate).toLocaleDateString()}
+      </div>
+    ),
+  },
+  {
+    accessor: 'id' as keyof FacultyType,
     header: '',
     cell: () => (
       <DropdownMenu>
@@ -114,7 +142,7 @@ const facultyColumns = [
           <DropdownMenuItem>Edit Details</DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem>Assign Classes</DropdownMenuItem>
-          <DropdownMenuItem>Performance Evaluation</DropdownMenuItem>
+          <DropdownMenuItem>Performance Report</DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem className="text-red-600">Deactivate</DropdownMenuItem>
         </DropdownMenuContent>
@@ -125,19 +153,25 @@ const facultyColumns = [
 
 const Faculty = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedDepartment, setSelectedDepartment] = useState<string | null>(null);
   
-  const filteredFaculty = mockFaculty.filter(faculty => 
-    faculty.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    faculty.employeeId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    faculty.department.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredFaculty = mockFaculty.filter(faculty => {
+    const matchesSearch = 
+      faculty.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      faculty.employeeId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      faculty.department.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesDepartment = !selectedDepartment || faculty.department === selectedDepartment;
+    
+    return matchesSearch && matchesDepartment;
+  });
 
   return (
     <div className="animate-fade-in space-y-6 p-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Faculty</h1>
-          <p className="text-muted-foreground">Manage faculty members and staff</p>
+          <p className="text-muted-foreground">Manage faculty information and assignments</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" size="sm">
@@ -158,7 +192,7 @@ const Faculty = () => {
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Printer className="mr-2 h-4 w-4" />
-                Print List
+                Print Directory
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -175,8 +209,8 @@ const Faculty = () => {
           className="w-full md:w-80" 
           onSearch={setSearchTerm}
         />
-        <div className="text-sm text-muted-foreground">
-          Showing <strong>{filteredFaculty.length}</strong> of <strong>{mockFaculty.length}</strong> faculty members
+        <div className="text-sm text-muted-foreground w-full md:w-auto text-left md:text-right">
+          Showing <strong>{filteredFaculty.length}</strong> of <strong>{mockFaculty.length}</strong> faculty
         </div>
       </div>
       

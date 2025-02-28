@@ -21,7 +21,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import SearchField from '@/components/ui/SearchField';
 import DataTable from '@/components/ui/DataTable';
-import { Student } from '@/types';
+import { type Student } from '@/types';
 
 // Mock data for demonstration
 const mockStudents: Student[] = Array.from({ length: 15 }, (_, i) => ({
@@ -41,12 +41,12 @@ const mockStudents: Student[] = Array.from({ length: 15 }, (_, i) => ({
 
 const studentsColumns = [
   {
-    accessor: 'rollNumber',
+    accessor: 'rollNumber' as keyof Student,
     header: 'Roll No.',
     sortable: true,
   },
   {
-    accessor: 'name',
+    accessor: 'name' as keyof Student,
     header: 'Name',
     sortable: true,
     cell: (student: Student) => (
@@ -65,21 +65,21 @@ const studentsColumns = [
     sortable: true,
   },
   {
-    accessor: 'gender',
+    accessor: 'gender' as keyof Student,
     header: 'Gender',
     sortable: true,
   },
   {
-    accessor: 'parentName',
+    accessor: 'parentName' as keyof Student,
     header: 'Parent Name',
     sortable: true,
   },
   {
-    accessor: 'contactNumber',
+    accessor: 'contactNumber' as keyof Student,
     header: 'Contact',
   },
   {
-    accessor: 'attendancePercentage',
+    accessor: 'attendancePercentage' as keyof Student,
     header: 'Attendance',
     sortable: true,
     cell: (student: Student) => {
@@ -103,7 +103,7 @@ const studentsColumns = [
     },
   },
   {
-    accessor: 'id',
+    accessor: 'id' as keyof Student,
     header: '',
     cell: () => (
       <DropdownMenu>

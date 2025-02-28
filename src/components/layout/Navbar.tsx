@@ -7,7 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { useSidebar } from '@/components/ui/sidebar';
 
 const Navbar = () => {
-  const { expanded, setExpanded } = useSidebar();
+  const { open, setOpen, state } = useSidebar();
   
   return (
     <header className="sticky top-0 z-30 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -16,10 +16,10 @@ const Navbar = () => {
           <Button 
             variant="ghost" 
             size="icon" 
-            onClick={() => setExpanded(!expanded)}
+            onClick={() => setOpen(!open)}
             aria-label="Toggle sidebar"
           >
-            {expanded ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {state === "expanded" ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
         </div>
         

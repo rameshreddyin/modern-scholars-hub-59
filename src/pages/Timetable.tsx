@@ -186,6 +186,9 @@ const mockFaculty: Faculty[] = [
 const weekdays: WeekDay[] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const timeSlots = ['09:00 - 09:45', '09:45 - 10:30', '10:45 - 11:30', '11:30 - 12:15', '12:15 - 13:00', '13:00 - 13:45', '13:45 - 14:30'];
 
+// Define a type for the teacher status to solve the comparison issue
+type TeacherStatus = 'available' | 'teaching' | 'unavailable' | 'unknown';
+
 const Timetable = () => {
   const { toast } = useToast();
   const [selectedClass, setSelectedClass] = useState<string | undefined>(mockClasses[0].id);
@@ -540,7 +543,8 @@ const Timetable = () => {
                                 return <TableCell key={i} className="bg-muted/30 text-center">Lunch</TableCell>;
                               }
                               
-                              let status: 'available' | 'teaching' | 'unavailable' | 'unknown' = 'unknown';
+                              // Define the status with our custom type
+                              let status: TeacherStatus = 'unknown';
                               
                               if (slot) {
                                 status = slot.isAvailable ? 'available' : 'teaching';

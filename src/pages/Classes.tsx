@@ -7,7 +7,11 @@ import {
   ChevronDown,
   ChevronRight,
   Users,
-  Clock
+  Clock,
+  Plus,
+  X,
+  Pencil,
+  Trash2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -24,6 +28,29 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { Badge } from '@/components/ui/badge';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 import SearchField from '@/components/ui/SearchField';
 import DashboardCard from '@/components/dashboard/DashboardCard';
 import { Class } from '@/types';
@@ -109,7 +136,7 @@ const mockClasses: Class[] = Array.from({ length: 9 }, (_, i) => ({
   room: `Room ${200 + i}`,
 }));
 
-const ClassCard = ({ classData }: { classData: Class }) => {
+const ClassCard = ({ classData, onEdit, onDelete }: { classData: Class; onEdit: (classData: Class) => void; onDelete: (classId: string) => void }) => {
   const [isOpen, setIsOpen] = useState(false);
   
   return (
@@ -128,23 +155,27 @@ const ClassCard = ({ classData }: { classData: Class }) => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem>View Details</DropdownMenuItem>
-              <DropdownMenuItem>Edit Class</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onEdit(classData)}>
+                <Pencil className="h-4 w-4 mr-2" />
+                Edit Class
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem>Manage Students</DropdownMenuItem>
               <DropdownMenuItem>View Timetable</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-600">Delete Class</DropdownMenuItem>
+              <DropdownMenuItem className="text-red-600" onClick={() => onDelete(classData.id)}>
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete Class
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <CollapsibleTrigger 
-            asChild 
+          <Button 
+            variant="ghost" 
+            size="sm"
             onClick={() => setIsOpen(!isOpen)}
           >
-            <Button variant="ghost" size="sm">
-              {isOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-            </Button>
-          </CollapsibleTrigger>
+            {isOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+          </Button>
         </div>
       </div>
       
@@ -222,13 +253,200 @@ const ClassCard = ({ classData }: { classData: Class }) => {
   );
 };
 
+// Add Class Form Component
+const ClassForm = ({ 
+  isOpen, 
+  onClose, 
+  onSubmit, 
+  editClass 
+}: { 
+  isOpen: boolean; 
+  onClose: () => void; 
+  onSubmit: (classData: Partial<Class>) => void; 
+  editClass?: Class 
+}) => {
+  const isEditing = !!editClass;
+  const [formData, setFormData] = useState<Partial<Class>>(
+    editClass || {
+      standard: '',
+      section: '',
+      classTeacher: '',
+      room: '',
+    }
+  );
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(formData);
+    onClose();
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>{isEditing ? 'Edit Class' : 'Add New Class'}</DialogTitle>
+          <DialogDescription>
+            {isEditing 
+              ? 'Update the details of this class'
+              : 'Enter the details for the new class'}
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit}>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="standard">Standard</Label>
+                <Input
+                  id="standard"
+                  name="standard"
+                  placeholder="e.g. 10"
+                  value={formData.standard}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="section">Section</Label>
+                <Input
+                  id="section"
+                  name="section"
+                  placeholder="e.g. A"
+                  value={formData.section}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
+            <div className="flex flex-col space-y-1.5">
+              <Label htmlFor="classTeacher">Class Teacher</Label>
+              <Input
+                id="classTeacher"
+                name="classTeacher"
+                placeholder="Enter teacher's name"
+                value={formData.classTeacher}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="flex flex-col space-y-1.5">
+              <Label htmlFor="room">Room Number</Label>
+              <Input
+                id="room"
+                name="room"
+                placeholder="e.g. Room 201"
+                value={formData.room}
+                onChange={handleChange}
+                required
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" type="button" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit">
+              {isEditing ? 'Update' : 'Add'} Class
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 const Classes = () => {
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
+  const [classes, setClasses] = useState<Class[]>(mockClasses);
+  const [isAddClassOpen, setIsAddClassOpen] = useState(false);
+  const [editClass, setEditClass] = useState<Class | undefined>(undefined);
+  const [deleteClassId, setDeleteClassId] = useState<string | null>(null);
   
-  const filteredClasses = mockClasses.filter(classData => 
+  const filteredClasses = classes.filter(classData => 
     classData.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     classData.classTeacher.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleAddClass = (newClass: Partial<Class>) => {
+    const classData: Class = {
+      id: `C${100 + classes.length}`,
+      name: `Class ${newClass.standard} ${newClass.section}`,
+      standard: newClass.standard || '',
+      section: newClass.section || '',
+      classTeacher: newClass.classTeacher || '',
+      totalStudents: 0,
+      subjects: [],
+      schedule: [],
+      room: newClass.room || '',
+    };
+    
+    setClasses([...classes, classData]);
+    toast({
+      title: "Class Added",
+      description: `${classData.name} has been successfully added.`,
+    });
+  };
+
+  const handleEditClass = (classData: Class) => {
+    setEditClass(classData);
+  };
+
+  const handleUpdateClass = (updatedClass: Partial<Class>) => {
+    if (!editClass) return;
+
+    const updatedClasses = classes.map(c => {
+      if (c.id === editClass.id) {
+        return {
+          ...c,
+          standard: updatedClass.standard || c.standard,
+          section: updatedClass.section || c.section,
+          name: `Class ${updatedClass.standard || c.standard} ${updatedClass.section || c.section}`,
+          classTeacher: updatedClass.classTeacher || c.classTeacher,
+          room: updatedClass.room || c.room,
+        };
+      }
+      return c;
+    });
+    
+    setClasses(updatedClasses);
+    setEditClass(undefined);
+    toast({
+      title: "Class Updated",
+      description: `Class details have been updated successfully.`,
+    });
+  };
+
+  const confirmDelete = (id: string) => {
+    setDeleteClassId(id);
+  };
+
+  const handleDeleteClass = () => {
+    if (!deleteClassId) return;
+    
+    const classToDelete = classes.find(c => c.id === deleteClassId);
+    const updatedClasses = classes.filter(c => c.id !== deleteClassId);
+    
+    setClasses(updatedClasses);
+    setDeleteClassId(null);
+    
+    toast({
+      title: "Class Deleted",
+      description: `${classToDelete?.name} has been deleted.`,
+    });
+  };
+
+  const closeEditForm = () => {
+    setEditClass(undefined);
+  };
 
   return (
     <div className="animate-fade-in space-y-6 p-6">
@@ -242,8 +460,8 @@ const Classes = () => {
             <Filter className="mr-2 h-4 w-4" />
             Filter
           </Button>
-          <Button size="sm">
-            <BookOpen className="mr-2 h-4 w-4" />
+          <Button size="sm" onClick={() => setIsAddClassOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
             Add Class
           </Button>
         </div>
@@ -256,15 +474,69 @@ const Classes = () => {
           onSearch={setSearchTerm}
         />
         <div className="text-sm text-muted-foreground">
-          Showing <strong>{filteredClasses.length}</strong> of <strong>{mockClasses.length}</strong> classes
+          Showing <strong>{filteredClasses.length}</strong> of <strong>{classes.length}</strong> classes
         </div>
       </div>
       
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {filteredClasses.map((classData) => (
-          <ClassCard key={classData.id} classData={classData} />
+          <ClassCard 
+            key={classData.id} 
+            classData={classData} 
+            onEdit={handleEditClass}
+            onDelete={confirmDelete}
+          />
         ))}
+        
+        {filteredClasses.length === 0 && (
+          <div className="col-span-full text-center p-8">
+            <div className="mx-auto w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-4">
+              <BookOpen className="h-6 w-6 text-muted-foreground" />
+            </div>
+            <h3 className="text-lg font-semibold mb-1">No Classes Found</h3>
+            <p className="text-muted-foreground mb-4">
+              {classes.length === 0 
+                ? "You haven't added any classes yet." 
+                : "No classes match your search criteria."}
+            </p>
+            {classes.length === 0 && (
+              <Button onClick={() => setIsAddClassOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                Add Your First Class
+              </Button>
+            )}
+          </div>
+        )}
       </div>
+
+      {/* Add/Edit Class Dialog */}
+      {(isAddClassOpen || editClass) && (
+        <ClassForm
+          isOpen={isAddClassOpen || !!editClass}
+          onClose={editClass ? closeEditForm : () => setIsAddClassOpen(false)}
+          onSubmit={editClass ? handleUpdateClass : handleAddClass}
+          editClass={editClass}
+        />
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!deleteClassId} onOpenChange={() => setDeleteClassId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the class
+              and remove its data from the system.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction className="bg-red-600 hover:bg-red-700" onClick={handleDeleteClass}>
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

@@ -20,6 +20,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Select,
   SelectContent,
@@ -539,7 +540,7 @@ const Timetable = () => {
                                 return <TableCell key={i} className="bg-muted/30 text-center">Lunch</TableCell>;
                               }
                               
-                              let status: 'available' | 'unavailable' | 'teaching' | 'unknown' = 'unknown';
+                              let status: 'available' | 'teaching' | 'unavailable' | 'unknown' = 'unknown';
                               
                               if (slot) {
                                 status = slot.isAvailable ? 'available' : 'teaching';

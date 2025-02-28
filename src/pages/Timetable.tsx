@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   CalendarDays, 
   AlertCircle, 
@@ -29,7 +29,15 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { type WeekDay, type Class, type Faculty } from '@/types';
+import { 
+  type WeekDay, 
+  type Class, 
+  type Faculty, 
+  type Period, 
+  type TeacherStatus,
+  type SubjectAllocation,
+  type ClassSubjectAllocation 
+} from '@/types';
 
 // Mock data
 const mockClasses: Class[] = [
@@ -149,7 +157,7 @@ const mockFaculty: Faculty[] = [
     department: 'Mathematics',
     position: 'HOD',
     gender: 'Male',
-    subject: ['Algebra', 'Geometry', 'Calculus'],
+    subject: ['Algebra', 'Geometry', 'Calculus', 'Mathematics'],
     qualification: 'Ph.D in Mathematics',
     contactNumber: '+91 9876543210',
     email: 'rajesh.kumar@schoolsync.edu',
@@ -165,6 +173,17 @@ const mockFaculty: Faculty[] = [
           { periodNumber: 6, startTime: '13:00', endTime: '13:45', isAvailable: true },
           { periodNumber: 7, startTime: '13:45', endTime: '14:30', isAvailable: true },
         ]
+      },
+      {
+        day: 'Tuesday',
+        slots: [
+          { periodNumber: 1, startTime: '09:00', endTime: '09:45', isAvailable: true },
+          { periodNumber: 2, startTime: '09:45', endTime: '10:30', isAvailable: false },
+          { periodNumber: 3, startTime: '10:45', endTime: '11:30', isAvailable: true },
+          { periodNumber: 4, startTime: '11:30', endTime: '12:15', isAvailable: true },
+          { periodNumber: 6, startTime: '13:00', endTime: '13:45', isAvailable: false },
+          { periodNumber: 7, startTime: '13:45', endTime: '14:30', isAvailable: true },
+        ]
       }
     ]
   },
@@ -175,19 +194,84 @@ const mockFaculty: Faculty[] = [
     department: 'Science',
     position: 'Senior Teacher',
     gender: 'Female',
-    subject: ['Physics', 'Chemistry', 'Biology'],
+    subject: ['Physics', 'Chemistry', 'Biology', 'Science'],
     qualification: 'M.Sc in Physics',
     contactNumber: '+91 9876543211',
     email: 'priya.sharma@schoolsync.edu',
-    joiningDate: '2012-06-10'
+    joiningDate: '2012-06-10',
+    availability: [
+      {
+        day: 'Monday',
+        slots: [
+          { periodNumber: 1, startTime: '09:00', endTime: '09:45', isAvailable: true },
+          { periodNumber: 2, startTime: '09:45', endTime: '10:30', isAvailable: false },
+          { periodNumber: 3, startTime: '10:45', endTime: '11:30', isAvailable: true },
+          { periodNumber: 4, startTime: '11:30', endTime: '12:15', isAvailable: true },
+          { periodNumber: 6, startTime: '13:00', endTime: '13:45', isAvailable: true },
+          { periodNumber: 7, startTime: '13:45', endTime: '14:30', isAvailable: false },
+        ]
+      }
+    ]
+  },
+  {
+    id: '3',
+    name: 'Prof. Amit Singh',
+    employeeId: 'EMP1003',
+    department: 'English',
+    position: 'Senior Teacher',
+    gender: 'Male',
+    subject: ['English Literature', 'Grammar', 'English'],
+    qualification: 'M.A. in English',
+    contactNumber: '+91 9876543212',
+    email: 'amit.singh@schoolsync.edu',
+    joiningDate: '2013-07-05',
+    availability: [
+      {
+        day: 'Wednesday',
+        slots: [
+          { periodNumber: 1, startTime: '09:00', endTime: '09:45', isAvailable: false },
+          { periodNumber: 2, startTime: '09:45', endTime: '10:30', isAvailable: true },
+          { periodNumber: 3, startTime: '10:45', endTime: '11:30', isAvailable: true },
+          { periodNumber: 4, startTime: '11:30', endTime: '12:15', isAvailable: true },
+          { periodNumber: 6, startTime: '13:00', endTime: '13:45', isAvailable: false },
+          { periodNumber: 7, startTime: '13:45', endTime: '14:30', isAvailable: true },
+        ]
+      }
+    ]
+  }
+];
+
+// Mock subject allocations for classes
+const mockSubjectAllocations: ClassSubjectAllocation[] = [
+  {
+    classId: '1',
+    className: 'Class 10A',
+    subjectAllocations: [
+      { subject: 'Mathematics', periodsPerWeek: 6, assignedTeacher: 'Dr. Rajesh Kumar' },
+      { subject: 'Science', periodsPerWeek: 6, assignedTeacher: 'Mrs. Priya Sharma' },
+      { subject: 'English', periodsPerWeek: 5, assignedTeacher: 'Prof. Amit Singh' },
+      { subject: 'Hindi', periodsPerWeek: 4, assignedTeacher: 'Dr. Neha Gupta' },
+      { subject: 'Social Science', periodsPerWeek: 4, assignedTeacher: 'Mr. Vikram Mehta' },
+      { subject: 'Computer Science', periodsPerWeek: 3, assignedTeacher: 'Mrs. Anjali Verma' },
+      { subject: 'Physical Education', periodsPerWeek: 2, assignedTeacher: 'Mr. Rahul Khanna' },
+    ]
+  },
+  {
+    classId: '2',
+    className: 'Class 9B',
+    subjectAllocations: [
+      { subject: 'Mathematics', periodsPerWeek: 6, assignedTeacher: 'Dr. Rajesh Kumar' },
+      { subject: 'Science', periodsPerWeek: 6, assignedTeacher: 'Mrs. Priya Sharma' },
+      { subject: 'English', periodsPerWeek: 5, assignedTeacher: 'Prof. Amit Singh' },
+      { subject: 'Hindi', periodsPerWeek: 4, assignedTeacher: 'Dr. Neha Gupta' },
+      { subject: 'Social Science', periodsPerWeek: 4, assignedTeacher: 'Mr. Vikram Mehta' },
+      { subject: 'Computer Science', periodsPerWeek: 3, assignedTeacher: 'Mrs. Anjali Verma' },
+    ]
   }
 ];
 
 const weekdays: WeekDay[] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const timeSlots = ['09:00 - 09:45', '09:45 - 10:30', '10:45 - 11:30', '11:30 - 12:15', '12:15 - 13:00', '13:00 - 13:45', '13:45 - 14:30'];
-
-// Define a type for the teacher status to solve the comparison issue
-type TeacherStatus = 'available' | 'teaching' | 'unavailable' | 'unknown';
 
 const Timetable = () => {
   const { toast } = useToast();
@@ -195,9 +279,10 @@ const Timetable = () => {
   const [viewMode, setViewMode] = useState<'table' | 'list'>('table');
   const [isEditingAllocation, setIsEditingAllocation] = useState(false);
   const [isGeneratingTimetable, setIsGeneratingTimetable] = useState(false);
+  const [subjectAllocations, setSubjectAllocations] = useState<ClassSubjectAllocation[]>(mockSubjectAllocations);
   
   // Initialize with empty periods for all days
-  const initialPeriodsMap: Record<WeekDay, { number: number; subject: string; teacher: string; startTime: string; endTime: string; }[]> = {
+  const initialPeriodsMap: Record<WeekDay, Period[]> = {
     Monday: [],
     Tuesday: [],
     Wednesday: [],
@@ -207,15 +292,149 @@ const Timetable = () => {
   };
   
   const [tempSchedule, setTempSchedule] = useState(initialPeriodsMap);
+  const [generatedTimetable, setGeneratedTimetable] = useState<Record<WeekDay, Period[]> | null>(null);
 
   const selectedClassData = mockClasses.find(c => c.id === selectedClass);
+  const selectedClassAllocation = subjectAllocations.find(a => a.classId === selectedClass);
+  
+  // Function to check teacher availability for a specific period
+  const checkTeacherAvailability = (teacherId: string, day: WeekDay, periodNumber: number): boolean => {
+    const teacher = mockFaculty.find(f => f.id === teacherId);
+    if (!teacher || !teacher.availability) return true; // Assume available if no data
+    
+    const dayAvailability = teacher.availability.find(a => a.day === day);
+    if (!dayAvailability) return true; // Assume available if no specific day data
+    
+    const slotAvailability = dayAvailability.slots.find(s => s.periodNumber === periodNumber);
+    return slotAvailability ? slotAvailability.isAvailable : true; // Assume available if no specific slot data
+  };
+
+  // Function to find available teacher for a subject
+  const findAvailableTeacher = (subject: string, day: WeekDay, periodNumber: number): string | null => {
+    // First, try to find the assigned teacher from subject allocations
+    const subjectAllocation = selectedClassAllocation?.subjectAllocations.find(s => s.subject === subject);
+    if (!subjectAllocation) return null;
+    
+    const assignedTeacher = mockFaculty.find(f => f.name === subjectAllocation.assignedTeacher);
+    if (!assignedTeacher) return null;
+    
+    // Check if assigned teacher is available
+    const isAvailable = checkTeacherAvailability(assignedTeacher.id, day, periodNumber);
+    if (isAvailable) return assignedTeacher.name;
+    
+    // If assigned teacher is not available, try to find an alternative
+    const alternativeTeachers = mockFaculty.filter(f => 
+      f.id !== assignedTeacher.id && 
+      f.subject.includes(subject) && 
+      checkTeacherAvailability(f.id, day, periodNumber)
+    );
+    
+    return alternativeTeachers.length > 0 ? alternativeTeachers[0].name : null;
+  };
+
+  // Function to generate a timetable based on subject allocations and teacher availability
+  const generateTimetable = () => {
+    if (!selectedClassAllocation) return;
+    
+    const newTimetable: Record<WeekDay, Period[]> = { ...initialPeriodsMap };
+    
+    // First, distribute subjects across the week based on periodsPerWeek
+    const totalPeriodsPerDay = 6; // Excluding lunch
+    let unassignedSubjects: Array<{ subject: string; count: number }> = [];
+    
+    // Initialize unassigned subjects based on periodsPerWeek
+    selectedClassAllocation.subjectAllocations.forEach(allocation => {
+      unassignedSubjects.push({ subject: allocation.subject, count: allocation.periodsPerWeek });
+    });
+    
+    // Fill in the timetable day by day, period by period
+    weekdays.forEach(day => {
+      newTimetable[day] = [];
+      
+      // Add lunch break
+      newTimetable[day].push({
+        number: 5,
+        subject: 'Lunch',
+        teacher: '-',
+        startTime: '12:15',
+        endTime: '13:00'
+      });
+      
+      // Try to assign subjects for other periods
+      for (let periodNum = 1; periodNum <= 7; periodNum++) {
+        if (periodNum === 5) continue; // Skip lunch period
+        
+        // Skip if no more subjects to assign
+        if (unassignedSubjects.every(s => s.count <= 0)) break;
+        
+        // Filter subjects that still need to be assigned
+        const availableSubjects = unassignedSubjects.filter(s => s.count > 0);
+        if (availableSubjects.length === 0) break;
+        
+        // Choose a subject (simple round-robin for now)
+        const subjectToAssign = availableSubjects[Math.floor(Math.random() * availableSubjects.length)];
+        
+        // Find an available teacher
+        const teacher = findAvailableTeacher(subjectToAssign.subject, day, periodNum);
+        
+        if (teacher) {
+          // Get time slot based on period number
+          const startTime = periodNum < 5 ? 
+            timeSlots[periodNum - 1].split(' - ')[0] : 
+            timeSlots[periodNum].split(' - ')[0];
+          const endTime = periodNum < 5 ? 
+            timeSlots[periodNum - 1].split(' - ')[1] : 
+            timeSlots[periodNum].split(' - ')[1];
+          
+          // Add period to the timetable
+          newTimetable[day].push({
+            number: periodNum,
+            subject: subjectToAssign.subject,
+            teacher: teacher,
+            startTime,
+            endTime
+          });
+          
+          // Decrease remaining count for this subject
+          const index = unassignedSubjects.findIndex(s => s.subject === subjectToAssign.subject);
+          if (index !== -1) {
+            unassignedSubjects[index].count--;
+          }
+        } else {
+          // If no teacher available, add a free period
+          const startTime = periodNum < 5 ? 
+            timeSlots[periodNum - 1].split(' - ')[0] : 
+            timeSlots[periodNum].split(' - ')[0];
+          const endTime = periodNum < 5 ? 
+            timeSlots[periodNum - 1].split(' - ')[1] : 
+            timeSlots[periodNum].split(' - ')[1];
+          
+          newTimetable[day].push({
+            number: periodNum,
+            subject: 'Free Period',
+            teacher: '-',
+            startTime,
+            endTime
+          });
+        }
+      }
+      
+      // Sort periods by period number
+      newTimetable[day].sort((a, b) => a.number - b.number);
+    });
+    
+    return newTimetable;
+  };
   
   const handleGenerateTimetable = () => {
     setIsGeneratingTimetable(true);
     
     // Simulate API call delay
     setTimeout(() => {
+      const newTimetable = generateTimetable();
+      setGeneratedTimetable(newTimetable || null);
       setIsGeneratingTimetable(false);
+      
       toast({
         title: "Timetable Generated",
         description: "Timetable has been successfully generated for the selected class.",
@@ -231,6 +450,25 @@ const Timetable = () => {
       description: "The subject allocation has been saved successfully.",
       variant: "default"
     });
+  };
+
+  // Helper function to update subject allocation
+  const updateSubjectAllocation = (subject: string, field: keyof SubjectAllocation, value: string | number) => {
+    if (!selectedClassAllocation) return;
+    
+    setSubjectAllocations(prev => 
+      prev.map(allocation => {
+        if (allocation.classId !== selectedClass) return allocation;
+        
+        return {
+          ...allocation,
+          subjectAllocations: allocation.subjectAllocations.map(subjectAlloc => {
+            if (subjectAlloc.subject !== subject) return subjectAlloc;
+            return { ...subjectAlloc, [field]: value };
+          })
+        };
+      })
+    );
   };
 
   return (
@@ -423,20 +661,23 @@ const Timetable = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {selectedClassData?.subjects.map((subject, index) => (
-                    <TableRow key={subject}>
-                      <TableCell className="font-medium">{subject}</TableCell>
+                  {selectedClassAllocation?.subjectAllocations.map((allocation, index) => (
+                    <TableRow key={allocation.subject}>
+                      <TableCell className="font-medium">{allocation.subject}</TableCell>
                       <TableCell>
                         {isEditingAllocation ? (
-                          <Select defaultValue={mockFaculty.find(f => f.subject.includes(subject))?.id}>
+                          <Select 
+                            defaultValue={allocation.assignedTeacher}
+                            onValueChange={(value) => updateSubjectAllocation(allocation.subject, 'assignedTeacher', value)}
+                          >
                             <SelectTrigger className="w-full">
                               <SelectValue placeholder="Select a teacher" />
                             </SelectTrigger>
                             <SelectContent>
                               {mockFaculty
-                                .filter(f => f.subject.includes(subject) || f.department === subject)
+                                .filter(f => f.subject.includes(allocation.subject) || f.department === allocation.subject)
                                 .map(teacher => (
-                                  <SelectItem key={teacher.id} value={teacher.id}>
+                                  <SelectItem key={teacher.id} value={teacher.name}>
                                     {teacher.name}
                                   </SelectItem>
                                 ))
@@ -444,12 +685,15 @@ const Timetable = () => {
                             </SelectContent>
                           </Select>
                         ) : (
-                          mockFaculty.find(f => f.subject.includes(subject))?.name || 'Not assigned'
+                          allocation.assignedTeacher || 'Not assigned'
                         )}
                       </TableCell>
                       <TableCell>
                         {isEditingAllocation ? (
-                          <Select defaultValue="6">
+                          <Select 
+                            defaultValue={allocation.periodsPerWeek.toString()}
+                            onValueChange={(value) => updateSubjectAllocation(allocation.subject, 'periodsPerWeek', parseInt(value))}
+                          >
                             <SelectTrigger className="w-20">
                               <SelectValue />
                             </SelectTrigger>
@@ -462,12 +706,12 @@ const Timetable = () => {
                             </SelectContent>
                           </Select>
                         ) : (
-                          '6'
+                          allocation.periodsPerWeek.toString()
                         )}
                       </TableCell>
                       <TableCell>
                         {isEditingAllocation ? (
-                          <Select defaultValue="any">
+                          <Select defaultValue={allocation.preferredDays ? allocation.preferredDays[0] : "any"}>
                             <SelectTrigger className="w-40">
                               <SelectValue />
                             </SelectTrigger>
@@ -481,7 +725,7 @@ const Timetable = () => {
                             </SelectContent>
                           </Select>
                         ) : (
-                          'Any day'
+                          allocation.preferredDays ? allocation.preferredDays.join(', ') : 'Any day'
                         )}
                       </TableCell>
                     </TableRow>
@@ -604,7 +848,7 @@ const Timetable = () => {
                   <div className="space-y-4">
                     <div>
                       <label className="text-sm font-medium">Select Class</label>
-                      <Select defaultValue={mockClasses[0].id}>
+                      <Select defaultValue={selectedClass} onValueChange={setSelectedClass}>
                         <SelectTrigger>
                           <SelectValue placeholder="Select a class" />
                         </SelectTrigger>
@@ -661,7 +905,7 @@ const Timetable = () => {
                           <SelectValue placeholder="Select subjects" />
                         </SelectTrigger>
                         <SelectContent>
-                          {mockClasses[0].subjects.map(subject => (
+                          {selectedClassData?.subjects.map(subject => (
                             <SelectItem key={subject} value={subject}>{subject}</SelectItem>
                           ))}
                         </SelectContent>
@@ -675,7 +919,7 @@ const Timetable = () => {
                           <SelectValue placeholder="Select subjects" />
                         </SelectTrigger>
                         <SelectContent>
-                          {mockClasses[0].subjects.map(subject => (
+                          {selectedClassData?.subjects.map(subject => (
                             <SelectItem key={subject} value={subject}>{subject}</SelectItem>
                           ))}
                         </SelectContent>
@@ -703,6 +947,53 @@ const Timetable = () => {
                   </div>
                 </div>
               </div>
+              
+              {generatedTimetable && (
+                <div className="mt-6">
+                  <h3 className="text-lg font-medium mb-4">Generated Timetable Preview</h3>
+                  <div className="overflow-auto border rounded-md">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-[100px]">Time</TableHead>
+                          {weekdays.map(day => (
+                            <TableHead key={day}>{day}</TableHead>
+                          ))}
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {timeSlots.map((timeSlot, index) => (
+                          <TableRow key={timeSlot}>
+                            <TableCell className="font-medium">
+                              {timeSlot}
+                              {index === 4 && <Badge variant="outline" className="ml-2">Lunch</Badge>}
+                            </TableCell>
+                            {weekdays.map(day => {
+                              const periodData = generatedTimetable[day]
+                                .find(p => p.startTime === timeSlot.split(' - ')[0]);
+                                
+                              return (
+                                <TableCell key={day} className={index === 4 ? 'bg-muted/30' : ''}>
+                                  {index === 4 ? (
+                                    <div className="text-center text-muted-foreground">Lunch Break</div>
+                                  ) : periodData ? (
+                                    <div>
+                                      <div className="font-medium">{periodData.subject}</div>
+                                      <div className="text-xs text-muted-foreground">{periodData.teacher}</div>
+                                    </div>
+                                  ) : (
+                                    <div className="text-muted-foreground text-center">-</div>
+                                  )}
+                                </TableCell>
+                              );
+                            })}
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
+              )}
             </CardContent>
             <CardFooter className="flex justify-between">
               <Button variant="outline">

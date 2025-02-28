@@ -146,3 +146,6 @@ export interface TimetableConflict {
   teacher: string;
   message: string;
 }
+
+// Define a type for the teacher status to use in the UI
+export type TeacherStatus = 'available' | 'teaching' | 'unavailable' | 'unknown';

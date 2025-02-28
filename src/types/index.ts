@@ -1,4 +1,5 @@
 
+
 export interface Student {
   id: string;
   name: string;
@@ -149,3 +150,53 @@ export interface TimetableConflict {
 
 // Define a type for the teacher status to use in the UI
 export type TeacherStatus = 'available' | 'teaching' | 'unavailable' | 'unknown';
+
+// Finance-related types
+export interface FeeCategory {
+  id: string;
+  name: string;
+  description: string;
+  amount: number;
+  frequency: 'Monthly' | 'Quarterly' | 'Annually' | 'One-time';
+  applicableClasses: string[];
+}
+
+export interface FeeStructure {
+  id: string;
+  academicYear: string;
+  standard: string;
+  categories: FeeCategoryAmount[];
+  totalAmount: number;
+}
+
+export interface FeeCategoryAmount {
+  categoryId: string;
+  categoryName: string;
+  amount: number;
+}
+
+export interface Payment {
+  id: string;
+  studentId: string;
+  studentName: string;
+  class: string;
+  section: string;
+  rollNumber: string;
+  amount: number;
+  paymentDate: string;
+  dueDate: string;
+  paymentMethod: 'Cash' | 'Credit Card' | 'Debit Card' | 'Bank Transfer' | 'Online Payment' | 'Cheque';
+  receiptNumber: string;
+  status: 'Paid' | 'Pending' | 'Overdue' | 'Partially Paid';
+  feeCategories: FeeCategoryAmount[];
+  remarks?: string;
+}
+
+export interface FinanceStats {
+  totalCollected: number;
+  pendingAmount: number;
+  overdueAmount: number;
+  totalStudentsPaid: number;
+  totalStudentsPending: number;
+}
+

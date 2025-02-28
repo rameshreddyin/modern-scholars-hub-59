@@ -12,7 +12,8 @@ import {
   BarChart, 
   Bell,
   Menu,
-  X
+  X,
+  DollarSign
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -36,6 +37,7 @@ const Sidebar = () => {
     { icon: BookOpen, label: 'Classes', path: '/classes' },
     { icon: ClipboardCheck, label: 'Attendance', path: '/attendance' },
     { icon: Calendar, label: 'Timetable', path: '/timetable' },
+    { icon: DollarSign, label: 'Finance', path: '/finance' },
     { icon: BarChart, label: 'Reports', path: '/reports' },
     { icon: Bell, label: 'Announcements', path: '/announcements' },
   ];

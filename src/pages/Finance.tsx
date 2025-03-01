@@ -1,33 +1,30 @@
 
 import React, { useState } from 'react';
 import { 
-  Tabs, 
-  TabsContent, 
-  TabsList, 
-  TabsTrigger 
-} from '@/components/ui/tabs';
+  CreditCard, 
+  DollarSign, 
+  Download, 
+  FileBarChart, 
+  Filter, 
+  Plus, 
+  PlusCircle, 
+  Receipt, 
+  Search, 
+  Users 
+} from 'lucide-react';
 import { 
   Card, 
   CardContent, 
   CardDescription, 
+  CardFooter, 
   CardHeader, 
   CardTitle 
 } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { 
-  CreditCard, 
-  DollarSign, 
-  Download, 
-  Plus, 
-  Search, 
-  Users,
-  Calendar,
-  CheckCircle2,
-  AlertCircle
-} from 'lucide-react';
-import DataTable from '@/components/ui/DataTable';
-import StatCard from '@/components/dashboard/StatCard';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
   Dialog, 
   DialogContent, 
@@ -37,146 +34,169 @@ import {
   DialogTitle, 
   DialogTrigger 
 } from '@/components/ui/dialog';
-import { Payment, FinanceStats, FeeCategory, FeeStructure } from '@/types';
+import { Label } from '@/components/ui/label';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
+import DataTable from '@/components/ui/DataTable';
+import { useToast } from '@/hooks/use-toast';
+import { 
+  FeeCategory, 
+  Payment, 
+  FeeStructure, 
+  FinanceStats, 
+  FeeCategoryAmount
+} from '@/types';
 
-// Mock data for demo purposes
+// Mock data for finance page
 const mockPayments: Payment[] = [
   {
     id: '1',
-    studentId: 'ST001',
-    studentName: 'Rahul Sharma',
+    studentId: '101',
+    studentName: 'Arjun Sharma',
     class: '10',
     section: 'A',
     rollNumber: '1001',
     amount: 25000,
-    paymentDate: '2023-04-15',
-    dueDate: '2023-04-10',
+    paymentDate: '2023-08-10',
+    dueDate: '2023-08-15',
     paymentMethod: 'Online Payment',
-    receiptNumber: 'REC-20230415-001',
+    receiptNumber: 'REC-10001',
     status: 'Paid',
     feeCategories: [
       { categoryId: '1', categoryName: 'Tuition Fee', amount: 15000 },
-      { categoryId: '2', categoryName: 'Computer Lab', amount: 5000 },
-      { categoryId: '3', categoryName: 'Library Fee', amount: 5000 }
+      { categoryId: '2', categoryName: 'Development Fee', amount: 5000 },
+      { categoryId: '3', categoryName: 'Computer Lab Fee', amount: 3000 },
+      { categoryId: '4', categoryName: 'Library Fee', amount: 2000 }
     ]
   },
   {
     id: '2',
-    studentId: 'ST002',
+    studentId: '102',
     studentName: 'Priya Patel',
     class: '9',
     section: 'B',
-    rollNumber: '901',
+    rollNumber: '902',
     amount: 25000,
-    paymentDate: '',
-    dueDate: '2023-04-10',
-    paymentMethod: 'Cash',
-    receiptNumber: '',
-    status: 'Pending',
+    paymentDate: '2023-08-12',
+    dueDate: '2023-08-15',
+    paymentMethod: 'Credit Card',
+    receiptNumber: 'REC-10002',
+    status: 'Paid',
     feeCategories: [
       { categoryId: '1', categoryName: 'Tuition Fee', amount: 15000 },
-      { categoryId: '2', categoryName: 'Computer Lab', amount: 5000 },
-      { categoryId: '3', categoryName: 'Library Fee', amount: 5000 }
+      { categoryId: '2', categoryName: 'Development Fee', amount: 5000 },
+      { categoryId: '3', categoryName: 'Computer Lab Fee', amount: 3000 },
+      { categoryId: '4', categoryName: 'Library Fee', amount: 2000 }
     ]
   },
   {
     id: '3',
-    studentId: 'ST003',
-    studentName: 'Amit Singh',
-    class: '8',
+    studentId: '103',
+    studentName: 'Vikram Singh',
+    class: '11',
     section: 'A',
-    rollNumber: '801',
-    amount: 22000,
-    paymentDate: '2023-03-05',
-    dueDate: '2023-03-10',
-    paymentMethod: 'Bank Transfer',
-    receiptNumber: 'REC-20230305-003',
-    status: 'Paid',
+    rollNumber: '1103',
+    amount: 30000,
+    paymentDate: '',
+    dueDate: '2023-08-15',
+    paymentMethod: 'Cash',
+    receiptNumber: 'REC-10003',
+    status: 'Pending',
     feeCategories: [
-      { categoryId: '1', categoryName: 'Tuition Fee', amount: 12000 },
-      { categoryId: '2', categoryName: 'Computer Lab', amount: 5000 },
-      { categoryId: '3', categoryName: 'Library Fee', amount: 5000 }
+      { categoryId: '1', categoryName: 'Tuition Fee', amount: 18000 },
+      { categoryId: '2', categoryName: 'Development Fee', amount: 7000 },
+      { categoryId: '3', categoryName: 'Computer Lab Fee', amount: 3000 },
+      { categoryId: '4', categoryName: 'Library Fee', amount: 2000 }
     ]
   },
   {
     id: '4',
-    studentId: 'ST004',
-    studentName: 'Neha Gupta',
-    class: '11',
+    studentId: '104',
+    studentName: 'Anjali Gupta',
+    class: '12',
     section: 'C',
-    rollNumber: '1101',
+    rollNumber: '1204',
     amount: 30000,
-    paymentDate: '',
-    dueDate: '2023-02-15',
-    paymentMethod: 'Credit Card',
-    receiptNumber: '',
+    paymentDate: '2023-07-20',
+    dueDate: '2023-07-15',
+    paymentMethod: 'Bank Transfer',
+    receiptNumber: 'REC-10004',
     status: 'Overdue',
     feeCategories: [
-      { categoryId: '1', categoryName: 'Tuition Fee', amount: 20000 },
-      { categoryId: '2', categoryName: 'Computer Lab', amount: 5000 },
-      { categoryId: '3', categoryName: 'Library Fee', amount: 5000 }
+      { categoryId: '1', categoryName: 'Tuition Fee', amount: 18000 },
+      { categoryId: '2', categoryName: 'Development Fee', amount: 7000 },
+      { categoryId: '3', categoryName: 'Computer Lab Fee', amount: 3000 },
+      { categoryId: '4', categoryName: 'Library Fee', amount: 2000 }
     ]
   },
   {
     id: '5',
-    studentId: 'ST005',
-    studentName: 'Karan Joshi',
-    class: '12',
-    section: 'A',
-    rollNumber: '1201',
-    amount: 30000,
-    paymentDate: '2023-04-12',
-    dueDate: '2023-04-15',
-    paymentMethod: 'Cheque',
-    receiptNumber: 'REC-20230412-005',
-    status: 'Paid',
+    studentId: '105',
+    studentName: 'Raj Malhotra',
+    class: '10',
+    section: 'B',
+    rollNumber: '1005',
+    amount: 25000,
+    paymentDate: '2023-08-05',
+    dueDate: '2023-08-15',
+    paymentMethod: 'Online Payment',
+    receiptNumber: 'REC-10005',
+    status: 'Partially Paid',
+    remarks: 'Remaining amount to be paid by September',
     feeCategories: [
-      { categoryId: '1', categoryName: 'Tuition Fee', amount: 20000 },
-      { categoryId: '2', categoryName: 'Computer Lab', amount: 5000 },
-      { categoryId: '3', categoryName: 'Library Fee', amount: 5000 }
+      { categoryId: '1', categoryName: 'Tuition Fee', amount: 15000 },
+      { categoryId: '2', categoryName: 'Development Fee', amount: 5000 },
+      { categoryId: '3', categoryName: 'Computer Lab Fee', amount: 3000 },
+      { categoryId: '4', categoryName: 'Library Fee', amount: 2000 }
     ]
   }
 ];
 
-const mockCategories: FeeCategory[] = [
+const mockFeeCategories: FeeCategory[] = [
   {
     id: '1',
     name: 'Tuition Fee',
-    description: 'Regular tuition fee',
+    description: 'Regular monthly tuition fee',
     amount: 15000,
     frequency: 'Quarterly',
     applicableClasses: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
   },
   {
     id: '2',
-    name: 'Computer Lab',
-    description: 'Computer laboratory fee',
+    name: 'Development Fee',
+    description: 'Fee for school infrastructure development',
     amount: 5000,
     frequency: 'Annually',
     applicableClasses: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
   },
   {
     id: '3',
-    name: 'Library Fee',
-    description: 'Access to library resources',
-    amount: 5000,
-    frequency: 'Annually',
-    applicableClasses: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
+    name: 'Computer Lab Fee',
+    description: 'Fee for computer lab usage and maintenance',
+    amount: 3000,
+    frequency: 'Quarterly',
+    applicableClasses: ['3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
   },
   {
     id: '4',
-    name: 'Sports Fee',
-    description: 'Sports activities and equipment',
-    amount: 3000,
+    name: 'Library Fee',
+    description: 'Fee for library usage and book maintenance',
+    amount: 2000,
     frequency: 'Annually',
     applicableClasses: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
   },
   {
     id: '5',
-    name: 'Development Fee',
-    description: 'School infrastructure development',
-    amount: 8000,
-    frequency: 'Annually',
+    name: 'Exam Fee',
+    description: 'Fee for conducting examinations',
+    amount: 1500,
+    frequency: 'Quarterly',
     applicableClasses: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
   }
 ];
@@ -187,26 +207,23 @@ const mockFeeStructures: FeeStructure[] = [
     academicYear: '2023-2024',
     standard: '1-5',
     categories: [
-      { categoryId: '1', categoryName: 'Tuition Fee', amount: 10000 },
-      { categoryId: '2', categoryName: 'Computer Lab', amount: 3000 },
-      { categoryId: '3', categoryName: 'Library Fee', amount: 2000 },
-      { categoryId: '4', categoryName: 'Sports Fee', amount: 2000 },
-      { categoryId: '5', categoryName: 'Development Fee', amount: 5000 }
+      { categoryId: '1', categoryName: 'Tuition Fee', amount: 12000 },
+      { categoryId: '2', categoryName: 'Development Fee', amount: 4000 },
+      { categoryId: '4', categoryName: 'Library Fee', amount: 1500 }
     ],
-    totalAmount: 22000
+    totalAmount: 17500
   },
   {
     id: '2',
     academicYear: '2023-2024',
     standard: '6-8',
     categories: [
-      { categoryId: '1', categoryName: 'Tuition Fee', amount: 12000 },
-      { categoryId: '2', categoryName: 'Computer Lab', amount: 5000 },
-      { categoryId: '3', categoryName: 'Library Fee', amount: 5000 },
-      { categoryId: '4', categoryName: 'Sports Fee', amount: 3000 },
-      { categoryId: '5', categoryName: 'Development Fee', amount: 8000 }
+      { categoryId: '1', categoryName: 'Tuition Fee', amount: 14000 },
+      { categoryId: '2', categoryName: 'Development Fee', amount: 4500 },
+      { categoryId: '3', categoryName: 'Computer Lab Fee', amount: 2500 },
+      { categoryId: '4', categoryName: 'Library Fee', amount: 1500 }
     ],
-    totalAmount: 33000
+    totalAmount: 22500
   },
   {
     id: '3',
@@ -214,383 +231,733 @@ const mockFeeStructures: FeeStructure[] = [
     standard: '9-10',
     categories: [
       { categoryId: '1', categoryName: 'Tuition Fee', amount: 15000 },
-      { categoryId: '2', categoryName: 'Computer Lab', amount: 5000 },
-      { categoryId: '3', categoryName: 'Library Fee', amount: 5000 },
-      { categoryId: '4', categoryName: 'Sports Fee', amount: 3000 },
-      { categoryId: '5', categoryName: 'Development Fee', amount: 8000 }
+      { categoryId: '2', categoryName: 'Development Fee', amount: 5000 },
+      { categoryId: '3', categoryName: 'Computer Lab Fee', amount: 3000 },
+      { categoryId: '4', categoryName: 'Library Fee', amount: 2000 }
     ],
-    totalAmount: 36000
+    totalAmount: 25000
   },
   {
     id: '4',
     academicYear: '2023-2024',
     standard: '11-12',
     categories: [
-      { categoryId: '1', categoryName: 'Tuition Fee', amount: 20000 },
-      { categoryId: '2', categoryName: 'Computer Lab', amount: 5000 },
-      { categoryId: '3', categoryName: 'Library Fee', amount: 5000 },
-      { categoryId: '4', categoryName: 'Sports Fee', amount: 3000 },
-      { categoryId: '5', categoryName: 'Development Fee', amount: 8000 }
+      { categoryId: '1', categoryName: 'Tuition Fee', amount: 18000 },
+      { categoryId: '2', categoryName: 'Development Fee', amount: 7000 },
+      { categoryId: '3', categoryName: 'Computer Lab Fee', amount: 3000 },
+      { categoryId: '4', categoryName: 'Library Fee', amount: 2000 }
     ],
-    totalAmount: 41000
+    totalAmount: 30000
   }
 ];
 
-// Calculate statistics from payment data
-const calculateStats = (payments: Payment[]): FinanceStats => {
-  const totalCollected = payments
-    .filter(p => p.status === 'Paid')
-    .reduce((sum, p) => sum + p.amount, 0);
-    
-  const pendingAmount = payments
-    .filter(p => p.status === 'Pending')
-    .reduce((sum, p) => sum + p.amount, 0);
-    
-  const overdueAmount = payments
-    .filter(p => p.status === 'Overdue')
-    .reduce((sum, p) => sum + p.amount, 0);
-    
-  const totalStudentsPaid = new Set(
-    payments
-      .filter(p => p.status === 'Paid')
-      .map(p => p.studentId)
-  ).size;
-  
-  const totalStudentsPending = new Set(
-    payments
-      .filter(p => p.status === 'Pending' || p.status === 'Overdue')
-      .map(p => p.studentId)
-  ).size;
-  
-  return {
-    totalCollected,
-    pendingAmount,
-    overdueAmount,
-    totalStudentsPaid,
-    totalStudentsPending
-  };
+const mockFinanceStats: FinanceStats = {
+  totalCollected: 75000,
+  pendingAmount: 55000,
+  overdueAmount: 30000,
+  totalStudentsPaid: 3,
+  totalStudentsPending: 2
 };
 
-const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
-    maximumFractionDigits: 0
-  }).format(amount);
+// Payment status badge colors
+const getStatusColor = (status: Payment['status']) => {
+  switch (status) {
+    case 'Paid':
+      return 'bg-green-50 text-green-600 border-green-100';
+    case 'Pending':
+      return 'bg-yellow-50 text-yellow-600 border-yellow-100';
+    case 'Overdue':
+      return 'bg-red-50 text-red-600 border-red-100';
+    case 'Partially Paid':
+      return 'bg-blue-50 text-blue-600 border-blue-100';
+    default:
+      return '';
+  }
 };
 
 const Finance = () => {
-  const [activeTab, setActiveTab] = useState("payments");
-  const stats = calculateStats(mockPayments);
-  
-  // Table columns for payments
+  const { toast } = useToast();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showAddPaymentDialog, setShowAddPaymentDialog] = useState(false);
+  const [showAddCategoryDialog, setShowAddCategoryDialog] = useState(false);
+  const [currentTab, setCurrentTab] = useState('overview');
+
+  // Function to format date to display
+  const formatDate = (dateString: string) => {
+    if (!dateString) return '-';
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  // Function to filter payments based on search query
+  const filteredPayments = mockPayments.filter(payment => 
+    payment.studentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    payment.rollNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    payment.receiptNumber.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Function to handle new payment submission
+  const handleAddPayment = (e: React.FormEvent) => {
+    e.preventDefault();
+    setShowAddPaymentDialog(false);
+    toast({
+      title: "Payment Added Successfully",
+      description: "The student payment has been recorded.",
+    });
+  };
+
+  // Function to handle new fee category submission
+  const handleAddCategory = (e: React.FormEvent) => {
+    e.preventDefault();
+    setShowAddCategoryDialog(false);
+    toast({
+      title: "Fee Category Added",
+      description: "The new fee category has been created successfully.",
+    });
+  };
+
+  // Column definitions for payment table
   const paymentColumns = [
     {
-      accessor: 'receiptNumber',
-      header: 'Receipt No.',
-      cell: (row: Payment) => row.receiptNumber || '-'
+      accessor: (row: Payment) => row.receiptNumber,
+      header: "Receipt #",
+      cell: (row: Payment) => row.receiptNumber,
+      sortable: true
     },
     {
-      accessor: 'studentName',
-      header: 'Student',
+      accessor: (row: Payment) => row.studentName,
+      header: "Student",
       cell: (row: Payment) => (
-        <div className="flex flex-col">
-          <span className="font-medium">{row.studentName}</span>
-          <span className="text-xs text-muted-foreground">
-            Class {row.class}-{row.section}, Roll: {row.rollNumber}
-          </span>
+        <div className="flex items-center gap-2">
+          <Avatar className="h-8 w-8">
+            <AvatarFallback>{row.studentName.substring(0, 2).toUpperCase()}</AvatarFallback>
+          </Avatar>
+          <div>
+            <div className="font-medium">{row.studentName}</div>
+            <div className="text-xs text-muted-foreground">
+              Class {row.class}-{row.section} | Roll #{row.rollNumber}
+            </div>
+          </div>
         </div>
-      )
+      ),
+      sortable: true
     },
     {
-      accessor: 'amount',
-      header: 'Amount',
-      cell: (row: Payment) => formatCurrency(row.amount)
+      accessor: (row: Payment) => row.amount,
+      header: "Amount",
+      cell: (row: Payment) => `₹${row.amount.toLocaleString()}`,
+      sortable: true
     },
     {
-      accessor: 'paymentDate',
-      header: 'Payment Date',
-      cell: (row: Payment) => row.paymentDate || '-'
+      accessor: (row: Payment) => row.paymentDate,
+      header: "Payment Date",
+      cell: (row: Payment) => formatDate(row.paymentDate),
+      sortable: true
     },
     {
-      accessor: 'dueDate',
-      header: 'Due Date',
-      cell: (row: Payment) => row.dueDate
-    },
-    {
-      accessor: 'paymentMethod',
-      header: 'Method',
-      cell: (row: Payment) => row.paymentMethod
-    },
-    {
-      accessor: 'status',
-      header: 'Status',
+      accessor: (row: Payment) => row.status,
+      header: "Status",
       cell: (row: Payment) => (
-        <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-          row.status === 'Paid' ? 'bg-green-100 text-green-800' :
-          row.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-          row.status === 'Overdue' ? 'bg-red-100 text-red-800' :
-          'bg-blue-100 text-blue-800'
-        }`}>
+        <Badge variant="outline" className={getStatusColor(row.status)}>
           {row.status}
-        </div>
-      )
+        </Badge>
+      ),
+      sortable: true
+    },
+    {
+      accessor: (row: Payment) => row.paymentMethod,
+      header: "Payment Method",
+      cell: (row: Payment) => row.paymentMethod,
+      sortable: true
     }
   ];
-  
-  // Table columns for fee categories
-  const categoryColumns = [
+
+  // Column definitions for fee categories table
+  const feeCategoryColumns = [
     {
-      accessor: 'name',
-      header: 'Category Name',
-      cell: (row: FeeCategory) => row.name
+      accessor: (row: FeeCategory) => row.name,
+      header: "Category Name",
+      cell: (row: FeeCategory) => row.name,
+      sortable: true
     },
     {
-      accessor: 'description',
-      header: 'Description',
-      cell: (row: FeeCategory) => row.description
+      accessor: (row: FeeCategory) => row.description,
+      header: "Description",
+      cell: (row: FeeCategory) => row.description,
+      sortable: true
     },
     {
-      accessor: 'amount',
-      header: 'Amount',
-      cell: (row: FeeCategory) => formatCurrency(row.amount)
+      accessor: (row: FeeCategory) => row.amount,
+      header: "Amount",
+      cell: (row: FeeCategory) => `₹${row.amount.toLocaleString()}`,
+      sortable: true
     },
     {
-      accessor: 'frequency',
-      header: 'Frequency',
-      cell: (row: FeeCategory) => row.frequency
+      accessor: (row: FeeCategory) => row.frequency,
+      header: "Frequency",
+      cell: (row: FeeCategory) => row.frequency,
+      sortable: true
     },
     {
-      accessor: 'applicableClasses',
-      header: 'Classes',
-      cell: (row: FeeCategory) => row.applicableClasses.join(', ')
+      accessor: (row: FeeCategory) => row.applicableClasses.join(', '),
+      header: "Applicable Classes",
+      cell: (row: FeeCategory) => row.applicableClasses.join(', '),
+      sortable: true
     }
   ];
-  
-  // Table columns for fee structures
-  const structureColumns = [
+
+  // Column definitions for fee structure table
+  const feeStructureColumns = [
     {
-      accessor: 'academicYear',
-      header: 'Academic Year',
-      cell: (row: FeeStructure) => row.academicYear
+      accessor: (row: FeeStructure) => row.academicYear,
+      header: "Academic Year",
+      cell: (row: FeeStructure) => row.academicYear,
+      sortable: true
     },
     {
-      accessor: 'standard',
-      header: 'Classes',
-      cell: (row: FeeStructure) => row.standard
+      accessor: (row: FeeStructure) => row.standard,
+      header: "Classes",
+      cell: (row: FeeStructure) => row.standard,
+      sortable: true
     },
     {
-      accessor: 'categories',
-      header: 'Categories',
-      cell: (row: FeeStructure) => `${row.categories.length} categories`
+      accessor: (row: FeeStructure) => row.totalAmount,
+      header: "Total Amount",
+      cell: (row: FeeStructure) => `₹${row.totalAmount.toLocaleString()}`,
+      sortable: true
     },
     {
-      accessor: 'totalAmount',
-      header: 'Total Amount',
-      cell: (row: FeeStructure) => formatCurrency(row.totalAmount)
+      accessor: (row: FeeStructure) => row.categories.length,
+      header: "Categories",
+      cell: (row: FeeStructure) => `${row.categories.length} categories`,
+      sortable: true
     }
   ];
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div className="animate-fade-in space-y-6 p-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Finance Management</h1>
-          <p className="text-muted-foreground">Manage school fees, payments, and financial reports</p>
+          <h1 className="text-3xl font-bold tracking-tight">Finance</h1>
+          <p className="text-muted-foreground">Manage student fees, payments, and financial reports</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline">
-            <Calendar className="mr-2 h-4 w-4" />
-            2023-2024
-          </Button>
-          <Button>
+          <Button variant="outline" size="sm">
             <Download className="mr-2 h-4 w-4" />
-            Export Reports
+            Export
+          </Button>
+          <Button onClick={() => setShowAddPaymentDialog(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            Record Payment
           </Button>
         </div>
       </div>
-      
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          title="Total Collected"
-          value={formatCurrency(stats.totalCollected)}
-          icon={DollarSign}
-          description="This academic year"
-          trend={{ value: 12.5, isPositive: true }}
-        />
-        <StatCard
-          title="Pending Amount"
-          value={formatCurrency(stats.pendingAmount)}
-          icon={CreditCard}
-          description="Upcoming payments"
-          trend={{ value: 5.2, isPositive: false }}
-        />
-        <StatCard
-          title="Overdue Amount"
-          value={formatCurrency(stats.overdueAmount)}
-          icon={AlertCircle}
-          description="Past due date"
-          trend={{ value: 8.7, isPositive: false }}
-        />
-        <StatCard
-          title="Students Paid"
-          value={`${stats.totalStudentsPaid}/${stats.totalStudentsPaid + stats.totalStudentsPending}`}
-          icon={CheckCircle2}
-          description="Complete payments"
-          trend={{ value: 15.3, isPositive: true }}
-        />
-      </div>
-      
-      <div className="bg-card rounded-lg border border-border shadow">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <div className="flex items-center justify-between border-b px-4 py-2">
-            <TabsList>
-              <TabsTrigger value="payments">Payments</TabsTrigger>
-              <TabsTrigger value="categories">Fee Categories</TabsTrigger>
-              <TabsTrigger value="structure">Fee Structure</TabsTrigger>
-              <TabsTrigger value="reports">Reports</TabsTrigger>
-            </TabsList>
-            <div className="flex items-center gap-2">
-              <div className="relative">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="Search..."
-                  className="pl-8 w-[200px] lg:w-[250px]"
-                />
-              </div>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button>
-                    <Plus className="mr-2 h-4 w-4" />
-                    New Payment
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[500px]">
-                  <DialogHeader>
-                    <DialogTitle>Add New Payment</DialogTitle>
-                    <DialogDescription>
-                      Record a new payment from a student
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="grid gap-4 py-4">
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <label htmlFor="student" className="text-right">
-                        Student
-                      </label>
-                      <Input id="student" className="col-span-3" placeholder="Select student" />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <label htmlFor="amount" className="text-right">
-                        Amount
-                      </label>
-                      <Input id="amount" className="col-span-3" type="number" placeholder="Enter amount" />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <label htmlFor="payment-method" className="text-right">
-                        Method
-                      </label>
-                      <Input id="payment-method" className="col-span-3" placeholder="Payment method" />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <label htmlFor="date" className="text-right">
-                        Date
-                      </label>
-                      <Input id="date" className="col-span-3" type="date" />
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <Button type="submit">Save Payment</Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </div>
+
+      <Tabs value={currentTab} onValueChange={setCurrentTab} className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="payments">Payments</TabsTrigger>
+          <TabsTrigger value="fee-structure">Fee Structure</TabsTrigger>
+          <TabsTrigger value="categories">Fee Categories</TabsTrigger>
+          <TabsTrigger value="reports">Reports</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total Collected</CardTitle>
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">₹{mockFinanceStats.totalCollected.toLocaleString()}</div>
+                <p className="text-xs text-muted-foreground">
+                  For current academic year
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Pending Amount</CardTitle>
+                <CreditCard className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">₹{mockFinanceStats.pendingAmount.toLocaleString()}</div>
+                <p className="text-xs text-muted-foreground">
+                  {mockFinanceStats.totalStudentsPending} students pending
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Overdue Amount</CardTitle>
+                <Receipt className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-red-500">₹{mockFinanceStats.overdueAmount.toLocaleString()}</div>
+                <p className="text-xs text-muted-foreground">
+                  Payments past due date
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Paid Students</CardTitle>
+                <Users className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{mockFinanceStats.totalStudentsPaid}</div>
+                <p className="text-xs text-muted-foreground">
+                  Out of {mockFinanceStats.totalStudentsPaid + mockFinanceStats.totalStudentsPending} students
+                </p>
+              </CardContent>
+            </Card>
           </div>
-          
-          <TabsContent value="payments" className="p-0">
-            <DataTable 
-              data={mockPayments} 
-              columns={paymentColumns}
-              onRowClick={(row) => console.log('Payment clicked:', row)}
-            />
-          </TabsContent>
-          
-          <TabsContent value="categories" className="p-0">
-            <DataTable 
-              data={mockCategories} 
-              columns={categoryColumns}
-              onRowClick={(row) => console.log('Category clicked:', row)}
-            />
-          </TabsContent>
-          
-          <TabsContent value="structure" className="p-0">
-            <DataTable 
-              data={mockFeeStructures} 
-              columns={structureColumns}
-              onRowClick={(row) => console.log('Structure clicked:', row)}
-            />
-            <div className="p-4 border-t">
-              <h3 className="font-medium mb-2">Details for selected structure</h3>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Class 9-10 Fee Structure (2023-2024)</CardTitle>
-                  <CardDescription>Total: {formatCurrency(36000)}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    {mockFeeStructures[2].categories.map(cat => (
-                      <div key={cat.categoryId} className="flex justify-between items-center">
-                        <span>{cat.categoryName}</span>
-                        <span>{formatCurrency(cat.amount)}</span>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card className="col-span-1">
+              <CardHeader>
+                <CardTitle>Recent Payments</CardTitle>
+                <CardDescription>
+                  Latest fee payments received
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {mockPayments.slice(0, 3).map(payment => (
+                    <div key={payment.id} className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Avatar className="h-9 w-9">
+                          <AvatarFallback>{payment.studentName.substring(0, 2).toUpperCase()}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="text-sm font-medium">{payment.studentName}</p>
+                          <p className="text-xs text-muted-foreground">Class {payment.class}-{payment.section}</p>
+                        </div>
                       </div>
-                    ))}
+                      <div className="text-right">
+                        <p className="text-sm font-medium">₹{payment.amount.toLocaleString()}</p>
+                        <p className="text-xs text-muted-foreground">{formatDate(payment.paymentDate)}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+              <CardFooter>
+                <Button variant="ghost" size="sm" className="w-full" onClick={() => setCurrentTab('payments')}>
+                  View All Payments
+                </Button>
+              </CardFooter>
+            </Card>
+
+            <Card className="col-span-1">
+              <CardHeader>
+                <CardTitle>Payment Methods</CardTitle>
+                <CardDescription>
+                  Distribution of payment methods used
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex items-center justify-center pt-6">
+                <div className="text-center">
+                  <div className="text-muted-foreground mb-4">Payment Method Distribution</div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1">
+                          <div className="h-2 w-2 rounded-full bg-primary"></div>
+                          <span className="text-xs">Online</span>
+                        </div>
+                        <span className="text-xs font-medium">40%</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1">
+                          <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+                          <span className="text-xs">Cash</span>
+                        </div>
+                        <span className="text-xs font-medium">20%</span>
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1">
+                          <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                          <span className="text-xs">Card</span>
+                        </div>
+                        <span className="text-xs font-medium">30%</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1">
+                          <div className="h-2 w-2 rounded-full bg-yellow-500"></div>
+                          <span className="text-xs">Bank</span>
+                        </div>
+                        <span className="text-xs font-medium">10%</span>
+                      </div>
+                    </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="payments" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                  <CardTitle>Payment History</CardTitle>
+                  <CardDescription>
+                    View and manage all student payments
+                  </CardDescription>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="relative">
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      type="search"
+                      placeholder="Search payments..."
+                      className="pl-8 w-full md:w-[250px]"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                  </div>
+                  <Button variant="outline" size="sm">
+                    <Filter className="mr-2 h-4 w-4" />
+                    Filter
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <DataTable 
+                data={filteredPayments}
+                columns={paymentColumns}
+                className="border rounded-md"
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="fee-structure" className="space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+            <Card className="lg:col-span-3">
+              <CardHeader>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div>
+                    <CardTitle>Fee Structures</CardTitle>
+                    <CardDescription>
+                      Manage fee structures for different classes
+                    </CardDescription>
+                  </div>
+                  <Button size="sm">
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    New Structure
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <DataTable 
+                  data={mockFeeStructures}
+                  columns={feeStructureColumns}
+                  className="border rounded-md"
+                />
+              </CardContent>
+            </Card>
+
+            <Card className="lg:col-span-1">
+              <CardHeader>
+                <CardTitle>Structure Details</CardTitle>
+                <CardDescription>
+                  Fee breakup for selected structure
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="font-medium mb-2">Classes 9-10 (2023-2024)</h3>
+                    <div className="space-y-2">
+                      {mockFeeStructures[2].categories.map((category) => (
+                        <div key={category.categoryId} className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">{category.categoryName}</span>
+                          <span>₹{category.amount.toLocaleString()}</span>
+                        </div>
+                      ))}
+                      <Separator className="my-2" />
+                      <div className="flex justify-between font-medium">
+                        <span>Total</span>
+                        <span>₹{mockFeeStructures[2].totalAmount.toLocaleString()}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="categories" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                  <CardTitle>Fee Categories</CardTitle>
+                  <CardDescription>
+                    Manage different types of fees
+                  </CardDescription>
+                </div>
+                <Button size="sm" onClick={() => setShowAddCategoryDialog(true)}>
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Add Category
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <DataTable 
+                data={mockFeeCategories}
+                columns={feeCategoryColumns}
+                className="border rounded-md"
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="reports" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Financial Reports</CardTitle>
+              <CardDescription>
+                Access and generate financial reports
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base">Collection Summary</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-sm">
+                      Comprehensive report of all fee collections for the current academic year
+                    </div>
+                  </CardContent>
+                  <CardFooter>
+                    <Button size="sm" variant="outline" className="w-full">
+                      <FileBarChart className="mr-2 h-4 w-4" />
+                      Generate Report
+                    </Button>
+                  </CardFooter>
+                </Card>
+                
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base">Defaulters List</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-sm">
+                      List of students with overdue fee payments
+                    </div>
+                  </CardContent>
+                  <CardFooter>
+                    <Button size="sm" variant="outline" className="w-full">
+                      <FileBarChart className="mr-2 h-4 w-4" />
+                      Generate Report
+                    </Button>
+                  </CardFooter>
+                </Card>
+                
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base">Class-wise Collection</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-sm">
+                      Report showing fee collection status for each class
+                    </div>
+                  </CardContent>
+                  <CardFooter>
+                    <Button size="sm" variant="outline" className="w-full">
+                      <FileBarChart className="mr-2 h-4 w-4" />
+                      Generate Report
+                    </Button>
+                  </CardFooter>
+                </Card>
+                
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base">Monthly Summary</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-sm">
+                      Month-wise breakdown of fee collections
+                    </div>
+                  </CardContent>
+                  <CardFooter>
+                    <Button size="sm" variant="outline" className="w-full">
+                      <FileBarChart className="mr-2 h-4 w-4" />
+                      Generate Report
+                    </Button>
+                  </CardFooter>
+                </Card>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+      {/* Add Payment Dialog */}
+      <Dialog open={showAddPaymentDialog} onOpenChange={setShowAddPaymentDialog}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Record New Payment</DialogTitle>
+            <DialogDescription>
+              Enter the payment details below to record a new fee payment.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleAddPayment}>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label htmlFor="student">Student</Label>
+                  <Select defaultValue="">
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select student" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="101">Arjun Sharma (10A)</SelectItem>
+                      <SelectItem value="102">Priya Patel (9B)</SelectItem>
+                      <SelectItem value="103">Vikram Singh (11A)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="amount">Amount (₹)</Label>
+                  <Input id="amount" type="number" placeholder="Enter amount" />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label htmlFor="paymentDate">Payment Date</Label>
+                  <Input id="paymentDate" type="date" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="paymentMethod">Payment Method</Label>
+                  <Select defaultValue="Cash">
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Cash">Cash</SelectItem>
+                      <SelectItem value="Credit Card">Credit Card</SelectItem>
+                      <SelectItem value="Debit Card">Debit Card</SelectItem>
+                      <SelectItem value="Bank Transfer">Bank Transfer</SelectItem>
+                      <SelectItem value="Online Payment">Online Payment</SelectItem>
+                      <SelectItem value="Cheque">Cheque</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="feeCategories">Fee Categories</Label>
+                <div className="border rounded-md p-3 space-y-2">
+                  {mockFeeCategories.slice(0, 3).map((category) => (
+                    <div key={category.id} className="flex items-center justify-between">
+                      <Label htmlFor={`category-${category.id}`} className="flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          id={`category-${category.id}`}
+                          className="mr-2 h-4 w-4"
+                          defaultChecked
+                        />
+                        {category.name}
+                      </Label>
+                      <Input
+                        type="number"
+                        className="w-24 h-8"
+                        defaultValue={category.amount}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="remarks">Remarks (Optional)</Label>
+                <Input id="remarks" placeholder="Add any additional notes" />
+              </div>
             </div>
-          </TabsContent>
-          
-          <TabsContent value="reports" className="p-4">
-            <div className="grid gap-4 md:grid-cols-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Collection Summary</CardTitle>
-                  <CardDescription>Monthly breakdown of fees collected</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[300px] flex items-center justify-center">
-                    <p className="text-muted-foreground">Collection chart will be displayed here</p>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle>Payment Methods</CardTitle>
-                  <CardDescription>Distribution by payment type</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[300px] flex items-center justify-center">
-                    <p className="text-muted-foreground">Payment methods chart will be displayed here</p>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card className="md:col-span-2">
-                <CardHeader>
-                  <CardTitle>Class-wise Collection</CardTitle>
-                  <CardDescription>Fee collection by class</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[300px] flex items-center justify-center">
-                    <p className="text-muted-foreground">Class-wise collection chart will be displayed here</p>
-                  </div>
-                </CardContent>
-              </Card>
+            <DialogFooter>
+              <Button type="submit">Record Payment</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Fee Category Dialog */}
+      <Dialog open={showAddCategoryDialog} onOpenChange={setShowAddCategoryDialog}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Add Fee Category</DialogTitle>
+            <DialogDescription>
+              Create a new fee category for student payments.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleAddCategory}>
+            <div className="grid gap-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="categoryName">Category Name</Label>
+                <Input id="categoryName" placeholder="e.g. Sports Fee" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="description">Description</Label>
+                <Input id="description" placeholder="Brief description of the fee" />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label htmlFor="amount">Amount (₹)</Label>
+                  <Input id="amount" type="number" placeholder="0" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="frequency">Frequency</Label>
+                  <Select defaultValue="Quarterly">
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Monthly">Monthly</SelectItem>
+                      <SelectItem value="Quarterly">Quarterly</SelectItem>
+                      <SelectItem value="Annually">Annually</SelectItem>
+                      <SelectItem value="One-time">One-time</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Applicable Classes</Label>
+                <div className="border rounded-md p-3 grid grid-cols-4 gap-2">
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((cls) => (
+                    <div key={cls} className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id={`class-${cls}`}
+                        defaultChecked
+                        className="mr-1 h-4 w-4"
+                      />
+                      <Label htmlFor={`class-${cls}`} className="text-sm cursor-pointer">
+                        Class {cls}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
-          </TabsContent>
-        </Tabs>
-      </div>
+            <DialogFooter>
+              <Button type="submit">Add Category</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { 
   CalendarDays, 
@@ -1088,10 +1087,17 @@ const Timetable: React.FC = () => {
     }
 
     // Generate teacher's schedule from all classes
-    const teacherSchedule: Record<WeekDay, Record<number, { class: Class; period: Period } | null>> = {};
+    const teacherSchedule: Record<WeekDay, Record<number, { class: Class; period: Period } | null>> = {
+      Monday: {},
+      Tuesday: {},
+      Wednesday: {},
+      Thursday: {},
+      Friday: {},
+      Saturday: {}
+    };
     
+    // Initialize all periods as null for each day
     daysOfWeek.forEach(day => {
-      teacherSchedule[day] = {};
       periodNumbers.forEach(periodNum => {
         teacherSchedule[day][periodNum] = null;
       });

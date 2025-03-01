@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { 
   CalendarDays, 
@@ -44,7 +45,7 @@ let mockClasses: Class[] = Array.from({ length: 5 }, (_, i) => ({
   section: ['A', 'B', 'C'][i % 3],
   classTeacher: `T${2000 + i}`,
   totalStudents: 35 + i,
-  subjects: ['Mathematics', 'Physics', 'Chemistry', 'Biology', 'English'][i % 5 === 0 ? 0 : i % 5],
+  subjects: ['Mathematics', 'Physics', 'Chemistry', 'Biology', 'English'],
   schedule: [
     {
       day: 'Monday',
@@ -107,7 +108,7 @@ const mockFaculty: Faculty[] = Array.from({ length: 10 }, (_, i) => ({
   department: ['Science', 'Mathematics', 'English', 'Social Studies', 'Computer Science'][i % 5],
   position: ['Teacher', 'Head Teacher', 'Senior Teacher'][i % 3],
   gender: i % 3 === 0 ? 'Female' : (i % 3 === 1 ? 'Male' : 'Other'),
-  subject: ['Mathematics', 'Physics', 'Chemistry', 'Biology', 'English'][i % 5 === 0 ? 0 : i % 5],
+  subject: [['Mathematics', 'Physics', 'Chemistry', 'Biology', 'English'][i % 5]],
   qualification: 'Master\'s Degree',
   contactNumber: `+91 98765${10000 + i}`,
   email: `teacher${i}@example.com`,

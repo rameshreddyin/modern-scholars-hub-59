@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { 
@@ -13,7 +12,11 @@ import {
   Bell,
   Menu,
   X,
-  DollarSign
+  DollarSign,
+  Home,
+  CalendarDays,
+  Wallet,
+  FileSpreadsheet
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -30,16 +33,15 @@ const Sidebar = () => {
   const { state } = useSidebar();
   const expanded = state === "expanded";
 
-  const menuItems = [
-    { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
-    { icon: GraduationCap, label: 'Students', path: '/students' },
-    { icon: Users, label: 'Faculty', path: '/faculty' },
-    { icon: BookOpen, label: 'Classes', path: '/classes' },
-    { icon: ClipboardCheck, label: 'Attendance', path: '/attendance' },
-    { icon: Calendar, label: 'Timetable', path: '/timetable' },
-    { icon: DollarSign, label: 'Finance', path: '/finance' },
-    { icon: BarChart, label: 'Reports', path: '/reports' },
-    { icon: Bell, label: 'Announcements', path: '/announcements' },
+  const links = [
+    { to: '/', icon: Home, label: 'Dashboard' },
+    { to: '/students', icon: GraduationCap, label: 'Students' },
+    { to: '/faculty', icon: Users, label: 'Faculty' },
+    { to: '/classes', icon: BookOpen, label: 'Classes' },
+    { to: '/attendance', icon: ClipboardCheck, label: 'Attendance' },
+    { to: '/timetable', icon: CalendarDays, label: 'Timetable' },
+    { to: '/finance', icon: Wallet, label: 'Finance' },
+    { to: '/exams', icon: FileSpreadsheet, label: 'Exams' },
   ];
 
   return (
@@ -69,10 +71,10 @@ const Sidebar = () => {
       </SidebarHeader>
       
       <SidebarContent className="py-4">
-        {menuItems.map((item, index) => (
+        {links.map((item, index) => (
           <NavLink
             key={index}
-            to={item.path}
+            to={item.to}
             className={({ isActive }) => cn(
               "flex items-center gap-3 px-3 py-2 mb-1 rounded-md transition-colors relative group",
               expanded ? "mx-2" : "mx-2 justify-center",

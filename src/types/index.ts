@@ -1,5 +1,3 @@
-
-
 export interface Student {
   id: string;
   name: string;
@@ -148,10 +146,8 @@ export interface TimetableConflict {
   message: string;
 }
 
-// Define a type for the teacher status to use in the UI
 export type TeacherStatus = 'available' | 'teaching' | 'unavailable' | 'unknown';
 
-// Finance-related types
 export interface FeeCategory {
   id: string;
   name: string;
@@ -200,3 +196,79 @@ export interface FinanceStats {
   totalStudentsPending: number;
 }
 
+export interface Exam {
+  id: string;
+  name: string;
+  description?: string;
+  startDate: string;
+  endDate: string;
+  examType: 'Mid Term' | 'Final Term' | 'Unit Test' | 'Annual Exam' | 'Other';
+  classes: string[];
+  subjects: ExamSubject[];
+  status: 'Draft' | 'Published' | 'Completed' | 'Cancelled';
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ExamSubject {
+  subjectId: string;
+  subjectName: string;
+  examDate: string;
+  startTime: string;
+  endTime: string;
+  maxMarks: number;
+  passingMarks: number;
+  venue?: string;
+}
+
+export interface ExamResult {
+  id: string;
+  examId: string;
+  examName: string;
+  studentId: string;
+  studentName: string;
+  studentRollNumber: string;
+  class: string;
+  section: string;
+  subjects: SubjectResult[];
+  totalMarks: number;
+  obtainedMarks: number;
+  percentage: number;
+  grade: string;
+  remarks?: string;
+  rank?: number;
+  status: 'Pass' | 'Fail' | 'Absent';
+  publishDate?: string;
+}
+
+export interface SubjectResult {
+  subjectId: string;
+  subjectName: string;
+  maxMarks: number;
+  obtainedMarks: number;
+  grade: string;
+  status: 'Pass' | 'Fail' | 'Absent';
+}
+
+export interface ExamSeatingArrangement {
+  id: string;
+  examId: string;
+  examName: string;
+  room: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  totalSeats: number;
+  invigilators: string[];
+  seatingPlan: StudentSeat[];
+}
+
+export interface StudentSeat {
+  studentId: string;
+  studentName: string;
+  rollNumber: string;
+  class: string;
+  section: string;
+  seatNumber: string;
+}

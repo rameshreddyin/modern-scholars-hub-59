@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   BookOpen, 
   Filter, 
@@ -32,17 +33,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import SearchField from '@/components/ui/SearchField';
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import ClassDetailView from '@/components/classes/ClassDetailView';
+import { Card, CardContent } from "@/components/ui/card";
 import { Class } from '@/types';
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
-import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -51,6 +43,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
 
 const mockClasses: Class[] = Array.from({ length: 9 }, (_, i) => ({
   id: `C${100 + i}`,
@@ -137,8 +130,15 @@ const ClassCard = ({ classData, onEdit, onDelete }: {
   onEdit: (classData: Class) => void; 
   onDelete: (classId: string) => void; 
 }) => {
+  const navigate = useNavigate();
+  
+  const handleViewDetails = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigate(`/classes/${classData.id}`);
+  };
+  
   return (
-    <Card className="group transition-all hover:shadow-md">
+    <Card className="group transition-all hover:shadow-md cursor-pointer" onClick={handleViewDetails}>
       <CardContent className="pt-6">
         <div className="flex justify-between items-start">
           <div className="space-y-1">
@@ -154,18 +154,27 @@ const ClassCard = ({ classData, onEdit, onDelete }: {
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" onClick={(e) => e.stopPropagation()}>
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => onEdit(classData)}>
+              <DropdownMenuItem onClick={(e) => {
+                e.stopPropagation();
+                onEdit(classData);
+              }}>
                 <Pencil className="h-4 w-4 mr-2" />
                 Edit Class
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-600" onClick={() => onDelete(classData.id)}>
+              <DropdownMenuItem 
+                className="text-red-600" 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(classData.id);
+                }}
+              >
                 <Trash2 className="h-4 w-4 mr-2" />
                 Delete Class
               </DropdownMenuItem>
@@ -201,6 +210,7 @@ const ClassCard = ({ classData, onEdit, onDelete }: {
           variant="ghost" 
           size="sm" 
           className="w-full mt-4 group-hover:bg-primary group-hover:text-primary-foreground"
+          onClick={handleViewDetails}
         >
           View Details
           <ChevronRight className="h-4 w-4 ml-2" />
@@ -321,12 +331,12 @@ const ClassForm = ({
 
 const Classes = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [classes, setClasses] = useState<Class[]>(mockClasses);
   const [isAddClassOpen, setIsAddClassOpen] = useState(false);
   const [editClass, setEditClass] = useState<Class | undefined>(undefined);
   const [deleteClassId, setDeleteClassId] = useState<string | null>(null);
-  const [selectedClass, setSelectedClass] = useState<Class | null>(null);
 
   const filteredClasses = classes.filter(classData => 
     classData.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -410,10 +420,6 @@ const Classes = () => {
     });
   };
 
-  const closeEditForm = () => {
-    setEditClass(undefined);
-  };
-
   return (
     <div className="animate-fade-in space-y-6 p-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -457,7 +463,7 @@ const Classes = () => {
               </h2>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {classesInStandard.map((classData) => (
-                  <div key={classData.id} onClick={() => setSelectedClass(classData)}>
+                  <div key={classData.id}>
                     <ClassCard 
                       classData={classData}
                       onEdit={handleEditClass}
@@ -518,18 +524,6 @@ const Classes = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      {/* Class Detail Sheet */}
-      <Sheet open={!!selectedClass} onOpenChange={() => setSelectedClass(null)}>
-        <SheetContent side="right" className="w-full sm:w-3/4 lg:w-2/3 xl:w-1/2">
-          <SheetHeader>
-            <SheetTitle>Class Details</SheetTitle>
-          </SheetHeader>
-          <ScrollArea className="h-[calc(100vh-8rem)] pr-4">
-            {selectedClass && <ClassDetailView classData={selectedClass} />}
-          </ScrollArea>
-        </SheetContent>
-      </Sheet>
     </div>
   );
 };

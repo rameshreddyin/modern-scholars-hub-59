@@ -186,6 +186,9 @@ const ClassCard = ({ classData, onEdit, onDelete }: {
           <div className="flex items-center gap-1">
             <Users className="h-4 w-4" />
             {classData.totalStudents} students
+            {classData.maxStrength && (
+              <span className="text-xs text-muted-foreground">/ {classData.maxStrength}</span>
+            )}
           </div>
           <div>•</div>
           <div>{classData.subjects.length} subjects</div>
@@ -238,6 +241,7 @@ const ClassForm = ({
       section: '',
       classTeacher: '',
       room: '',
+      maxStrength: 50,
     }
   );
 
@@ -245,7 +249,7 @@ const ClassForm = ({
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value,
+      [name]: name === 'maxStrength' ? Number(value) : value,
     });
   };
 
@@ -303,16 +307,31 @@ const ClassForm = ({
                 required
               />
             </div>
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="room">Room Number</Label>
-              <Input
-                id="room"
-                name="room"
-                placeholder="e.g. Room 201"
-                value={formData.room}
-                onChange={handleChange}
-                required
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="room">Room Number</Label>
+                <Input
+                  id="room"
+                  name="room"
+                  placeholder="e.g. Room 201"
+                  value={formData.room}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="maxStrength">Maximum Strength</Label>
+                <Input
+                  id="maxStrength"
+                  name="maxStrength"
+                  type="number"
+                  min="1"
+                  placeholder="e.g. 50"
+                  value={formData.maxStrength}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
             </div>
           </div>
           <DialogFooter>
@@ -333,7 +352,15 @@ const Classes = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
-  const [classes, setClasses] = useState<Class[]>(mockClasses);
+  const [classes, setClasses] = useState<Class[]>(mockClasses.map(c => ({
+    ...c, 
+    maxStrength: c.maxStrength || 50,
+    performanceMetrics: c.performanceMetrics || {
+      averageAttendance: 85 + (Math.random() * 10),
+      averageAcademics: 70 + (Math.random() * 20),
+      passPercentage: 90 + (Math.random() * 10)
+    }
+  })));
   const [isAddClassOpen, setIsAddClassOpen] = useState(false);
   const [editClass, setEditClass] = useState<Class | undefined>(undefined);
   const [deleteClassId, setDeleteClassId] = useState<string | null>(null);
@@ -360,9 +387,15 @@ const Classes = () => {
       section: newClass.section || '',
       classTeacher: newClass.classTeacher || '',
       totalStudents: 0,
+      maxStrength: newClass.maxStrength || 50,
       subjects: [],
       schedule: [],
       room: newClass.room || '',
+      performanceMetrics: {
+        averageAttendance: 0,
+        averageAcademics: 0,
+        passPercentage: 0
+      }
     };
     
     setClasses([...classes, classData]);
@@ -388,6 +421,7 @@ const Classes = () => {
           name: `Class ${updatedClass.standard || c.standard} ${updatedClass.section || c.section}`,
           classTeacher: updatedClass.classTeacher || c.classTeacher,
           room: updatedClass.room || c.room,
+          maxStrength: updatedClass.maxStrength || c.maxStrength,
         };
       }
       return c;

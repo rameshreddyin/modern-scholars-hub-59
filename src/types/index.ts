@@ -49,9 +49,15 @@ export interface Class {
   section: string;
   classTeacher: string;
   totalStudents: number;
+  maxStrength: number;
   subjects: string[];
   schedule: ClassSchedule[];
   room: string;
+  performanceMetrics?: {
+    averageAttendance: number;
+    averageAcademics: number;
+    passPercentage: number;
+  };
 }
 
 export type WeekDay = 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday';

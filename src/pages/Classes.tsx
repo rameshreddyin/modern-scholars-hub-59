@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -52,6 +53,7 @@ const mockClasses: Class[] = Array.from({ length: 9 }, (_, i) => ({
   section: ['A', 'B', 'C'][i % 3],
   classTeacher: ['Dr. Rajesh Kumar', 'Mrs. Priya Sharma', 'Mr. Amit Singh', 'Dr. Neha Gupta', 'Mr. Vikram Mehta', 'Mrs. Anjali Verma', 'Mr. Sanjay Patel', 'Dr. Pooja Reddy'][i % 8],
   totalStudents: 30 + (i % 15),
+  maxStrength: 50, // Adding maxStrength which was missing
   subjects: [
     'Mathematics', 'Physics', 'Chemistry', 'Biology', 'English', 'Hindi', 
     'Social Studies', 'Computer Science', 'Physical Education'
@@ -123,6 +125,11 @@ const mockClasses: Class[] = Array.from({ length: 9 }, (_, i) => ({
     },
   ],
   room: `Room ${200 + i}`,
+  performanceMetrics: {
+    averageAttendance: 85 + (Math.random() * 10),
+    averageAcademics: 70 + (Math.random() * 20),
+    passPercentage: 90 + (Math.random() * 10)
+  }
 }));
 
 const ClassCard = ({ classData, onEdit, onDelete }: { 

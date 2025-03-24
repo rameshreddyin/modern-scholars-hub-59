@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronLeft, Users, Clock, ChartBar, Plus, Pencil, Save, X } from 'lucide-react';
@@ -683,4 +684,107 @@ const ClassDetail = () => {
                   <Label htmlFor="gender">Gender</Label>
                   <select
                     id="gender"
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    value={selectedStudent.gender}
+                    onChange={(e) => setSelectedStudent({...selectedStudent, gender: e.target.value as 'F' | 'M'})}
+                  >
+                    <option value="F">Female</option>
+                    <option value="M">Male</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col space-y-1.5">
+                  <Label htmlFor="rollNumber">Roll Number</Label>
+                  <Input
+                    id="rollNumber"
+                    value={selectedStudent.rollNumber}
+                    onChange={(e) => setSelectedStudent({...selectedStudent, rollNumber: e.target.value})}
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col space-y-1.5">
+                  <Label htmlFor="academicAverage">Academic Average (%)</Label>
+                  <Input
+                    id="academicAverage"
+                    type="number"
+                    value={selectedStudent.academicAverage}
+                    onChange={(e) => setSelectedStudent({...selectedStudent, academicAverage: Number(e.target.value)})}
+                    min={0}
+                    max={100}
+                  />
+                </div>
+                <div className="flex flex-col space-y-1.5">
+                  <Label htmlFor="attendancePercentage">Attendance (%)</Label>
+                  <Input
+                    id="attendancePercentage"
+                    type="number"
+                    value={selectedStudent.attendancePercentage}
+                    onChange={(e) => setSelectedStudent({...selectedStudent, attendancePercentage: Number(e.target.value)})}
+                    min={0}
+                    max={100}
+                  />
+                </div>
+              </div>
+            </div>
+            <DialogFooter className="flex justify-between">
+              <div>
+                {selectedStudent.id.includes("STU") && (
+                  <Button 
+                    variant="destructive" 
+                    size="sm" 
+                    onClick={() => {
+                      setIsConfirmDeleteOpen(true);
+                      setIsEditStudentDialogOpen(false);
+                    }}
+                  >
+                    Delete Student
+                  </Button>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => setIsEditStudentDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={() => handleSaveStudent(selectedStudent)}>
+                  Save Changes
+                </Button>
+              </div>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Confirm Delete Dialog */}
+      <AlertDialog open={isConfirmDeleteOpen} onOpenChange={setIsConfirmDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete{' '}
+              {selectedStudent?.name} from the class.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel 
+              onClick={() => {
+                setIsConfirmDeleteOpen(false);
+                setIsEditStudentDialogOpen(true);
+              }}
+            >
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteStudent}>
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+};
+
+export default ClassDetail;

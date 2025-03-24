@@ -46,14 +46,14 @@ const ClassDetailView: React.FC<ClassDetailViewProps> = ({ classData }) => {
 
   const studentColumns = [
     {
-      accessor: 'rollNumber',
+      accessor: 'rollNumber' as keyof StudentData,
       header: 'Roll No.',
       cell: (row: StudentData) => (
         <div className="font-mono text-sm">{row.rollNumber}</div>
       ),
     },
     {
-      accessor: 'name',
+      accessor: 'name' as keyof StudentData,
       header: 'Student Name',
       cell: (row: StudentData) => (
         <div className="flex items-center gap-2">
@@ -66,7 +66,7 @@ const ClassDetailView: React.FC<ClassDetailViewProps> = ({ classData }) => {
       ),
     },
     {
-      accessor: 'academicAverage',
+      accessor: 'academicAverage' as keyof StudentData,
       header: 'Academic Average',
       cell: (row: StudentData) => (
         <div className="flex items-center gap-2">
@@ -82,7 +82,7 @@ const ClassDetailView: React.FC<ClassDetailViewProps> = ({ classData }) => {
       ),
     },
     {
-      accessor: 'attendancePercentage',
+      accessor: 'attendancePercentage' as keyof StudentData,
       header: 'Attendance',
       cell: (row: StudentData) => (
         <div className="flex items-center gap-2">

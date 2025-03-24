@@ -1,41 +1,22 @@
-
 import React, { useState } from 'react';
 import { 
   BookOpen, 
   Filter, 
   MoreHorizontal,
-  ChevronDown,
-  ChevronRight,
   Users,
-  Clock,
   Plus,
-  X,
   Pencil,
-  Trash2
+  Trash2,
+  ChevronRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { 
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { 
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
-import { Badge } from '@/components/ui/badge';
-import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   AlertDialog,
@@ -46,16 +27,31 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import SearchField from '@/components/ui/SearchField';
-import DashboardCard from '@/components/dashboard/DashboardCard';
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import ClassDetailView from '@/components/classes/ClassDetailView';
 import { Class } from '@/types';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 
-// Mock data for demonstration
 const mockClasses: Class[] = Array.from({ length: 9 }, (_, i) => ({
   id: `C${100 + i}`,
   name: `Class ${9 + Math.floor(i / 3)} ${['A', 'B', 'C'][i % 3]}`,
@@ -136,17 +132,26 @@ const mockClasses: Class[] = Array.from({ length: 9 }, (_, i) => ({
   room: `Room ${200 + i}`,
 }));
 
-const ClassCard = ({ classData, onEdit, onDelete }: { classData: Class; onEdit: (classData: Class) => void; onDelete: (classId: string) => void }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  
+const ClassCard = ({ classData, onEdit, onDelete }: { 
+  classData: Class; 
+  onEdit: (classData: Class) => void; 
+  onDelete: (classId: string) => void; 
+}) => {
   return (
-    <DashboardCard className="overflow-hidden">
-      <div className="flex justify-between items-center">
-        <div>
-          <h3 className="font-semibold text-lg">{classData.name}</h3>
-          <p className="text-sm text-muted-foreground">Room: {classData.room}</p>
-        </div>
-        <div className="flex gap-2">
+    <Card className="group transition-all hover:shadow-md">
+      <CardContent className="pt-6">
+        <div className="flex justify-between items-start">
+          <div className="space-y-1">
+            <h3 className="font-semibold text-lg flex items-center gap-2">
+              {classData.name}
+              <Badge variant="secondary" className="text-xs">
+                Room {classData.room}
+              </Badge>
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              {classData.classTeacher}
+            </p>
+          </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm">
@@ -160,100 +165,51 @@ const ClassCard = ({ classData, onEdit, onDelete }: { classData: Class; onEdit: 
                 Edit Class
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Manage Students</DropdownMenuItem>
-              <DropdownMenuItem>View Timetable</DropdownMenuItem>
-              <DropdownMenuSeparator />
               <DropdownMenuItem className="text-red-600" onClick={() => onDelete(classData.id)}>
                 <Trash2 className="h-4 w-4 mr-2" />
                 Delete Class
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button 
-            variant="ghost" 
-            size="sm"
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            {isOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-          </Button>
         </div>
-      </div>
-      
-      <div className="flex flex-wrap gap-2 mt-2">
-        <div className="flex items-center text-sm text-muted-foreground">
-          <Users className="h-4 w-4 mr-1" />
-          {classData.totalStudents} students
+
+        <div className="flex flex-wrap gap-2 mt-4 text-sm text-muted-foreground">
+          <div className="flex items-center gap-1">
+            <Users className="h-4 w-4" />
+            {classData.totalStudents} students
+          </div>
+          <div>•</div>
+          <div>{classData.subjects.length} subjects</div>
         </div>
-        <div className="flex items-center text-sm text-muted-foreground">
-          <BookOpen className="h-4 w-4 mr-1" />
-          {classData.subjects.length} subjects
-        </div>
-      </div>
-      
-      <div className="mt-4">
-        <p className="text-sm font-medium">Class Teacher</p>
-        <p className="text-sm">{classData.classTeacher}</p>
-      </div>
-      
-      <div className="flex flex-wrap gap-1 mt-4">
-        {classData.subjects.slice(0, 5).map((subject, index) => (
-          <Badge key={index} variant="secondary" className="text-xs">
-            {subject}
-          </Badge>
-        ))}
-        {classData.subjects.length > 5 && (
-          <Badge variant="outline" className="text-xs">
-            +{classData.subjects.length - 5} more
-          </Badge>
-        )}
-      </div>
-      
-      <Collapsible open={isOpen}>
-        <CollapsibleContent className="mt-4 pt-4 border-t">
-          <p className="text-sm font-medium mb-2">Weekly Schedule</p>
-          <div className="space-y-2">
-            {classData.schedule.slice(0, 3).map((day) => (
-              <div key={day.day} className="text-sm">
-                <p className="font-medium">{day.day}</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-1">
-                  {day.periods.slice(0, 4).map((period) => (
-                    <div key={period.number} className="flex items-center">
-                      <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-medium mr-2">
-                        {period.number}
-                      </div>
-                      <div>
-                        <p className="text-xs font-medium">{period.subject}</p>
-                        <div className="flex items-center text-xs text-muted-foreground">
-                          <Clock className="h-3 w-3 mr-1" />
-                          {period.startTime} - {period.endTime}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                  {day.periods.length > 4 && (
-                    <div className="text-xs text-muted-foreground col-span-full">
-                      + {day.periods.length - 4} more periods
-                    </div>
-                  )}
-                </div>
-              </div>
+
+        <div className="mt-4 pt-4 border-t">
+          <div className="flex flex-wrap gap-1">
+            {classData.subjects.slice(0, 3).map((subject, index) => (
+              <Badge key={index} variant="secondary" className="text-xs">
+                {subject}
+              </Badge>
             ))}
-            {classData.schedule.length > 3 && (
-              <p className="text-xs text-muted-foreground">
-                + {classData.schedule.length - 3} more days
-              </p>
+            {classData.subjects.length > 3 && (
+              <Badge variant="outline" className="text-xs">
+                +{classData.subjects.length - 3} more
+              </Badge>
             )}
           </div>
-          <Button variant="outline" size="sm" className="mt-4 w-full">
-            View Full Timetable
-          </Button>
-        </CollapsibleContent>
-      </Collapsible>
-    </DashboardCard>
+        </div>
+        
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="w-full mt-4 group-hover:bg-primary group-hover:text-primary-foreground"
+        >
+          View Details
+          <ChevronRight className="h-4 w-4 ml-2" />
+        </Button>
+      </CardContent>
+    </Card>
   );
 };
 
-// Add Class Form Component
 const ClassForm = ({ 
   isOpen, 
   onClose, 
@@ -370,11 +326,21 @@ const Classes = () => {
   const [isAddClassOpen, setIsAddClassOpen] = useState(false);
   const [editClass, setEditClass] = useState<Class | undefined>(undefined);
   const [deleteClassId, setDeleteClassId] = useState<string | null>(null);
-  
+  const [selectedClass, setSelectedClass] = useState<Class | null>(null);
+
   const filteredClasses = classes.filter(classData => 
     classData.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     classData.classTeacher.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const groupedClasses = filteredClasses.reduce((acc, classData) => {
+    const standard = classData.standard;
+    if (!acc[standard]) {
+      acc[standard] = [];
+    }
+    acc[standard].push(classData);
+    return acc;
+  }, {} as Record<string, Class[]>);
 
   const handleAddClass = (newClass: Partial<Class>) => {
     const classData: Class = {
@@ -477,19 +443,34 @@ const Classes = () => {
           Showing <strong>{filteredClasses.length}</strong> of <strong>{classes.length}</strong> classes
         </div>
       </div>
-      
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {filteredClasses.map((classData) => (
-          <ClassCard 
-            key={classData.id} 
-            classData={classData} 
-            onEdit={handleEditClass}
-            onDelete={confirmDelete}
-          />
-        ))}
-        
+
+      <div className="space-y-8">
+        {Object.entries(groupedClasses)
+          .sort(([a], [b]) => Number(a) - Number(b))
+          .map(([standard, classesInStandard]) => (
+            <div key={standard} className="space-y-4">
+              <h2 className="text-lg font-semibold flex items-center gap-2">
+                Standard {standard}
+                <Badge variant="secondary">
+                  {classesInStandard.length} {classesInStandard.length === 1 ? 'class' : 'classes'}
+                </Badge>
+              </h2>
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {classesInStandard.map((classData) => (
+                  <div key={classData.id} onClick={() => setSelectedClass(classData)}>
+                    <ClassCard 
+                      classData={classData}
+                      onEdit={handleEditClass}
+                      onDelete={confirmDelete}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+
         {filteredClasses.length === 0 && (
-          <div className="col-span-full text-center p-8">
+          <div className="text-center p-8">
             <div className="mx-auto w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-4">
               <BookOpen className="h-6 w-6 text-muted-foreground" />
             </div>
@@ -513,7 +494,7 @@ const Classes = () => {
       {(isAddClassOpen || editClass) && (
         <ClassForm
           isOpen={isAddClassOpen || !!editClass}
-          onClose={editClass ? closeEditForm : () => setIsAddClassOpen(false)}
+          onClose={editClass ? () => setEditClass(undefined) : () => setIsAddClassOpen(false)}
           onSubmit={editClass ? handleUpdateClass : handleAddClass}
           editClass={editClass}
         />
@@ -531,12 +512,24 @@ const Classes = () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction className="bg-red-600 hover:bg-red-700" onClick={handleDeleteClass}>
+            <AlertDialogAction onClick={handleDeleteClass} className="bg-red-600 hover:bg-red-700">
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Class Detail Sheet */}
+      <Sheet open={!!selectedClass} onOpenChange={() => setSelectedClass(null)}>
+        <SheetContent side="right" className="w-full sm:w-3/4 lg:w-2/3 xl:w-1/2">
+          <SheetHeader>
+            <SheetTitle>Class Details</SheetTitle>
+          </SheetHeader>
+          <ScrollArea className="h-[calc(100vh-8rem)] pr-4">
+            {selectedClass && <ClassDetailView classData={selectedClass} />}
+          </ScrollArea>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };

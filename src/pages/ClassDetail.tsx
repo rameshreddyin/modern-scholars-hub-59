@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronLeft, Users, Clock, ChartBar, Plus, Pencil, Save, X } from 'lucide-react';
@@ -574,7 +573,7 @@ const ClassDetail = () => {
                       </div>
                       <div className="grid grid-cols-3 gap-2 mt-4">
                         <Card className="p-3">
-                          <p className="text-xs text-muted-foreground">Regular (>90%)</p>
+                          <p className="text-xs text-muted-foreground">Regular (&gt;90%)</p>
                           <p className="text-lg font-bold">{Math.round(students.filter(s => s.attendancePercentage >= 90).length / students.length * 100)}%</p>
                         </Card>
                         <Card className="p-3">
@@ -684,116 +683,4 @@ const ClassDetail = () => {
                   <Label htmlFor="gender">Gender</Label>
                   <select
                     id="gender"
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
-                    value={selectedStudent.gender}
-                    onChange={(e) => setSelectedStudent({...selectedStudent, gender: e.target.value as 'M' | 'F'})}
-                  >
-                    <option value="M">Male</option>
-                    <option value="F">Female</option>
-                  </select>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col space-y-1.5">
-                  <Label htmlFor="rollNumber">Roll Number</Label>
-                  <Input
-                    id="rollNumber"
-                    value={selectedStudent.rollNumber}
-                    onChange={(e) => setSelectedStudent({...selectedStudent, rollNumber: e.target.value})}
-                  />
-                </div>
-                <div className="flex flex-col space-y-1.5">
-                  <Label htmlFor="academicAverage">Academic Average (%)</Label>
-                  <Input
-                    id="academicAverage"
-                    type="number"
-                    min="0"
-                    max="100"
-                    value={selectedStudent.academicAverage}
-                    onChange={(e) => setSelectedStudent({...selectedStudent, academicAverage: Number(e.target.value)})}
-                  />
-                </div>
-              </div>
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="attendancePercentage">Attendance Percentage (%)</Label>
-                <Input
-                  id="attendancePercentage"
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={selectedStudent.attendancePercentage}
-                  onChange={(e) => setSelectedStudent({...selectedStudent, attendancePercentage: Number(e.target.value)})}
-                />
-              </div>
-            </div>
-            <DialogFooter className="flex justify-between">
-              <div>
-                {selectedStudent.id.includes("STU") && (
-                  <Button variant="destructive" onClick={() => {
-                    setIsConfirmDeleteOpen(true);
-                  }}>
-                    Delete Student
-                  </Button>
-                )}
-              </div>
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={() => {
-                  setIsEditStudentDialogOpen(false);
-                  setSelectedStudent(null);
-                }}>
-                  Cancel
-                </Button>
-                <Button onClick={() => {
-                  if (selectedStudent.id.includes("STU")) {
-                    handleSaveStudent(selectedStudent);
-                  } else {
-                    const newStudent = {
-                      ...selectedStudent,
-                      id: `STU${students.length + 1}`
-                    };
-                    setStudents([...students, newStudent]);
-                    setIsEditStudentDialogOpen(false);
-                    setSelectedStudent(null);
-                    
-                    // Update class data
-                    setClassData({
-                      ...classData,
-                      totalStudents: students.length + 1
-                    });
-                    
-                    toast({
-                      title: "Student Added",
-                      description: `${newStudent.name} has been added to the class.`,
-                    });
-                  }
-                }}>
-                  Save Changes
-                </Button>
-              </div>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      )}
-
-      {/* Confirm Delete Student Dialog */}
-      <AlertDialog open={isConfirmDeleteOpen} onOpenChange={setIsConfirmDeleteOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently remove {selectedStudent?.name} from this class. This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteStudent} className="bg-red-600 hover:bg-red-700">
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
-  );
-};
-
-export default ClassDetail;
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-
